@@ -16,7 +16,10 @@ The following file types are known to be *writable* with this library:
 ## Copyright
 Mark Henning's copyright statement in the original source code Readme.txt is as follows:  
 
-"You may use [the source code] as-is or in any modified form in your own software (non-commercial or commercial) as long as you mention the above copyright somewhere in
+"The source code is (C)opyright 2009 by: Mark Henning, Germany
+http://www.mark-henning.de
+
+You may use [the source code] as-is or in any modified form in your own software (non-commercial or commercial) as long as you mention the above copyright somewhere in
 - the software
 - and the documentation
 - and the tuning files written using it. (as comment line)
