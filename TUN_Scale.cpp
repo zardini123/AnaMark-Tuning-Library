@@ -454,7 +454,7 @@ bool CSingleScale::Write(std::ostream & os,
 		WriteSection(os, SEC_FunctionalTuning);
 		os.precision(10);
 		os << m_vstrKeys.at(KEY_InitEqual).c_str()
-		   << " = (" << m_lInitEqual_BaseNote 
+		   << " = (" << m_lInitEqual_BaseNote
 		   << ", " << m_dblInitEqual_BaseFreqHz
 		   << ")" << std::endl;
 		std::list<CFormula>::const_iterator	it;
@@ -924,7 +924,10 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 			case KEY_Note:
 				if ( !CheckType(strValue, dblET_TunesCents[lKeyIndex]) )
 					return -1;
-				lET_LastNoteFound = __max(lET_LastNoteFound, lKeyIndex);
+
+				// Originally used __max, a windows only function macro
+				// 	#define __max(a,b) (((a) > (b)) ? (a) : (b))
+				lET_LastNoteFound = std::max(lET_LastNoteFound, lKeyIndex);
 				break;
 			}
 			break;
@@ -1016,10 +1019,10 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 		ResetKeyboardMapping();
 		// Transfer Values from [Tuning] to m_vdblNoteFrequenciesHz
 		InitEqual(0, DefaultBaseFreqHz);
-		for ( i = 0 ; i < MaxNumOfNotes ; ++i )
+		for ( int i = 0 ; i < MaxNumOfNotes ; ++i )
 			m_vdblNoteFrequenciesHz.at(i) = Cents2Hz(lT_TunesCents[i], DefaultBaseFreqHz);
 		// Create formulas to represent values
-		for ( i = MaxNumOfNotes-1 ; i >= 0 ; --i )
+		for ( int i = MaxNumOfNotes-1 ; i >= 0 ; --i )
 		{
 			CFormula	formula(i);
 			formula.SetToCentsAbsRef(lT_TunesCents[i], 0);
@@ -1040,11 +1043,11 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 		}
 		// Transfer Values from [Exact Tuning] to m_vdblNoteFrequenciesHz
 		InitEqual(0, dblET_BaseFreqHz);
-		for ( i = 0 ; i < MaxNumOfNotes ; ++i )
+		for ( int i = 0 ; i < MaxNumOfNotes ; ++i )
 			m_vdblNoteFrequenciesHz.at(i) = Cents2Hz(dblET_TunesCents[i], dblET_BaseFreqHz);
 		// Create formulas to represent values
 		// (in reverse order to avoid special handling if note 0 != 0 cents)
-		for ( i = MaxNumOfNotes-1 ; i >= 0 ; --i )
+		for ( int i = MaxNumOfNotes-1 ; i >= 0 ; --i )
 		{
 			CFormula	formula(i);
 			formula.SetToCentsAbsRef(dblET_TunesCents[i], 0);
@@ -1295,5 +1298,3 @@ bool CSingleScale::IsNoteIndexOK(int nIndex)
 
 
 } // namespace TUN
-
-

@@ -25,19 +25,31 @@ namespace TUN
 namespace strx
 {
 //////////////////////////////////////////////////////////////////////
-// String tool functions
+// Character tool functions
 //////////////////////////////////////////////////////////////////////
 
+// Replaces __iscsymf
+// From Microsoft docs:
+// 		int __iscsymf(
+//    		int c
+// 		);
+//
+// 		Both __iscsymf and __iswcsymf return a nonzero value if c is a
+// 		letter or an underscore.
+// 		Each of these routines returns 0 if c does not satisfy the test condition.
+int IsLetterOrUnderscore(int c)
+{
+	return isalpha(c) || c == '_';
+}
 
-
-
+//////////////////////////////////////////////////////////////////////
+// String tool functions
+//////////////////////////////////////////////////////////////////////
 
 const char * WhiteSpaceChars()
 {
 	return "\x09\x0a\x0b\x0c\x0d\x20";
 }
-
-
 
 std::string & ToLower(std::string & str)
 {
@@ -48,7 +60,13 @@ std::string & ToLower(std::string & str)
 
 std::string	GetAsLower(const std::string & str)
 {
-	return ToLower(std::string(str));
+	// CHANGED: String function output is placed into a temp std::string as
+	// 		the following function needs a variable to pass by reference,
+	// 		but the string function (construction) is not a referencable value.
+	// This must be done a couple times throughout StringTools.cpp.  See all
+	// 		variables titled "temp"
+	std::string temp = std::string(str);
+	return ToLower(temp);
 }
 
 
@@ -96,24 +114,29 @@ std::string & Escape(std::string & str)
 		switch ( str.at(l) )
 		{
 		case '\0': strEsc += "\\0"; break; // Nullbyte
-		case '\a': strEsc += "\\a"; break; // Bell (alert) 
-		case '\b': strEsc += "\\b"; break; // Backspace 
-		case '\f': strEsc += "\\f"; break; // Formfeed 
-		case '\n': strEsc += "\\n"; break; // New line 
-		case '\r': strEsc += "\\r"; break; // Carriage return 
-		case '\t': strEsc += "\\t"; break; // Horizontal tab 
-		case '\v': strEsc += "\\v"; break; // Vertical tab 
-		case '\'': strEsc += "\\\'"; break; // Single quotation mark 
-		case '\"': strEsc += "\\\""; break; // Double quotation mark 
-		case '\\': strEsc += "\\\\"; break; // Backslash 
-		case '\?': strEsc += "\\?"; break; // Literal question mark 
+		case '\a': strEsc += "\\a"; break; // Bell (alert)
+		case '\b': strEsc += "\\b"; break; // Backspace
+		case '\f': strEsc += "\\f"; break; // Formfeed
+		case '\n': strEsc += "\\n"; break; // New line
+		case '\r': strEsc += "\\r"; break; // Carriage return
+		case '\t': strEsc += "\\t"; break; // Horizontal tab
+		case '\v': strEsc += "\\v"; break; // Vertical tab
+		case '\'': strEsc += "\\\'"; break; // Single quotation mark
+		case '\"': strEsc += "\\\""; break; // Double quotation mark
+		case '\\': strEsc += "\\\\"; break; // Backslash
+		case '\?': strEsc += "\\?"; break; // Literal question mark
 		default:
 			if ( (static_cast<unsigned char>(str.at(l)) < 0x20) ||
 				 (static_cast<unsigned char>(str.at(l)) == 0xff) )
 			{
 				char	szHex[3] = "00";
 				strEsc += "\\x0";
-				strEsc += ltoa(static_cast<unsigned char>(str.at(l)), szHex, 16);
+
+				// CHANGED:  Removed hexidecimal ltoa usage
+				// Original usage:
+				// 	 strEsc += ltoa(static_cast<unsigned char>(str.at(l)), szHex, 16);
+				sprintf(szHex, "%x", static_cast<unsigned char>(str.at(l)));
+				strEsc += szHex;
 			}
 			else
 				strEsc += str.at(l);
@@ -141,17 +164,17 @@ std::string & Unescape(std::string & str)
 			switch ( ch = str.at(posR++) )
 			{
 				case '0': ch = '\0'; break; // Nullbyte
-				case 'a': ch = '\a'; break; // Bell (alert) 
-				case 'b': ch = '\b'; break; // Backspace 
-				case 'f': ch = '\f'; break; // Formfeed 
-				case 'n': ch = '\n'; break; // New line 
-				case 'r': ch = '\r'; break; // Carriage return 
-				case 't': ch = '\t'; break; // Horizontal tab 
-				case 'v': ch = '\v'; break; // Vertical tab 
-				case '\'': ch = '\''; break; // Single quotation mark 
-				case '\"': ch = '\"'; break; // Double quotation mark 
-				case '\\': ch = '\\'; break; // Backslash 
-				case '?': ch = '\?'; break; // Literal question mark 
+				case 'a': ch = '\a'; break; // Bell (alert)
+				case 'b': ch = '\b'; break; // Backspace
+				case 'f': ch = '\f'; break; // Formfeed
+				case 'n': ch = '\n'; break; // New line
+				case 'r': ch = '\r'; break; // Carriage return
+				case 't': ch = '\t'; break; // Horizontal tab
+				case 'v': ch = '\v'; break; // Vertical tab
+				case '\'': ch = '\''; break; // Single quotation mark
+				case '\"': ch = '\"'; break; // Double quotation mark
+				case '\\': ch = '\\'; break; // Backslash
+				case '?': ch = '\?'; break; // Literal question mark
 				case 'x': // Hex representation
 					ch = strtol(("0x0" + str.substr(posR, 3)).c_str(), NULL, 16);
 					posR += 3;
@@ -204,11 +227,16 @@ bool Eval(const std::string & str, std::string::size_type & pos, long & lResult)
 bool EvalKeyAndValue(std::string & str, std::string & strKey, std::string & strValue)
 {
 	std::string::size_type	pos = str.find('=');
-	if ( (pos == std::string::npos) || (!__iscsymf(str.at(0))) )
+
+	// CHANGED: IsLetterOrUnderscore replaced __iscsymf
+	if ( (pos == std::string::npos) || (!IsLetterOrUnderscore(str.at(0))) )
 		return false; // error: no '=' or first char of key is invalid
 
-	strKey = ToLower(Trim(str.substr(0, pos)));
-	strValue = Trim(str.substr(pos+1));
+	std::string temp = str.substr(0, pos);
+	strKey = ToLower(Trim(temp));
+
+	temp = str.substr(pos+1);
+	strValue = Trim(temp);
 	return true;
 }
 
@@ -218,7 +246,9 @@ bool EvalSection(std::string & str)
 {
 	if ( (str.size() < 2) || (str.at(0) != '[') || (str.at(str.size()-1) != ']') )
 		return false;
-	str = ToLower(Trim(str.substr(1, str.size()-2)));
+
+	std::string temp = str.substr(1, str.size()-2);
+	str = ToLower(Trim(temp));
 	return true;
 }
 
@@ -238,7 +268,9 @@ bool EvalString(std::string & str)
 {
 	if ( (str.size() < 2) || (str.at(0) != '\"') || (str.at(str.size()-1) != '\"') )
 		return false;
-	str = Unescape(str.substr(1, str.size()-2));
+
+	std::string temp = str.substr(1, str.size()-2);
+	str = Unescape(temp);
 	return true;
 }
 
@@ -292,19 +324,23 @@ void Split(std::string & str, char chSeparator, std::list<std::string> & lstrRes
 // Convert double- and long-values to string
 std::string ltostr(long lValue)
 {
-	char	sz[11]; // Enough for 32-Bit long
-	return std::string(ltoa(lValue, sz, 10));
+	// CHANGED:  Removed ltoa usage
+	// Original usage:
+	// char	sz[11]; // Enough for 32-Bit long
+	// 	...ltoa(lValue, sz, 10)...
+	return std::to_string(lValue);
 }
-
-
 
 std::string dtostr(double dblValue)
 {
 	char	sz[30]; // Enough for 64-Bit double
-	return std::string(_gcvt(dblValue, 20, sz));
+
+	// TODO:  Replace function call gcvt and test, as gcvt is not standard
+	// 		Original call was _gcvt, where _gcvt was Windows only
+	//    May not be avaliable in all compilers, nor operate the same
+	// 		gcvt is avaliable in gcc v9.2.0 Homebrew
+	return std::string(gcvt(dblValue, 20, sz));
 }
-
-
 
 std::string	GetAsSection(const std::string & str)
 {
@@ -315,7 +351,8 @@ std::string	GetAsSection(const std::string & str)
 
 std::string	GetAsString(const std::string & str)
 {
-	return "\"" + Escape(std::string(str)) + "\"";
+	std::string temp = std::string(str);
+	return "\"" + Escape(temp) + "\"";
 }
 
 

@@ -70,9 +70,12 @@ public:
 			m_strErrorMsg = "";
 		else
 		{
+			//              012345
 			char	sz[16] = "Line 1234567890"; // Enough for 32-Bit
 			if ( lLineNr >= 0 )
-				m_strErrorMsg = std::string(ltoa(lLineNr, &sz[5], 10)) + ": " + szErrorMsg;
+				// CHANGED:  Removed ltoa usage
+				// Original usage:  ... ltoa(lLineNr, &sz[5], 10) ...
+				m_strErrorMsg = "Line " + std::to_string(lLineNr) + ": " + szErrorMsg;
 			else
 				m_strErrorMsg = szErrorMsg;
 		}
