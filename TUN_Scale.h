@@ -163,9 +163,28 @@ public:
 	// Get base note / base frequency
 	long	GetBaseNote() const { return m_lInitEqual_BaseNote; }
 	double	GetBaseFreqHz() const { return m_dblInitEqual_BaseFreqHz; }
-	// Read-access of the note frequencies
-	// (NOTE: Vector index is scale note number, NOT MIDI note number!)
+
+	/**
+	 * Read-access of the note frequencies
+	 *
+	 * Be aware that frequencies <= 0 Hz could be returned, especially
+	 * when the .tun file loaded makes use of the [Functional Tuning] section.
+	 * It is strongly suggest to handle notes of such frequencies as "muted" notes.
+	 * (i.e. do not output any sound on these notes.)
+	 *
+	 * (NOTE: Vector index is scale note number, NOT MIDI note number!)
+	 * @return Frequencies of scale notes.
+	 */
 	const std::vector<double> &	GetNoteFrequenciesHz() const { return m_vdblNoteFrequenciesHz; }
+
+	/**
+	 * Be aware that frequencies <= 0 Hz could be returned, especially
+ 	 * when the .tun file loaded makes use of the [Functional Tuning] section.
+ 	 * It is strongly suggest to handle notes of such frequencies as "muted" notes.
+ 	 * (i.e. do not output any sound on these notes.)
+	 * @param  lMIDINoteNumber MIDI note number (0 to 127)
+	 * @return                 Frequency of that note in scale
+	 */
 	double						GetMIDINoteFreqHz(long lMIDINoteNumber) const { return m_vdblNoteFrequenciesHz.at(MapMIDI2Scale(lMIDINoteNumber)); }
 	// Write-access of the note frequencies
 	// When changing values you must make use of the CFormula class

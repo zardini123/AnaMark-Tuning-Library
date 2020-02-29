@@ -23,7 +23,6 @@
 
 
 
-
 namespace TUN
 {
 
@@ -53,17 +52,18 @@ struct SRVParam
 		t_AbsRef,	// Parameter given as absolute reference
 		t_RelRef	// Parameter given as relative reference
 	}			m_paramtype;
+
 	long		m_lRef;		// Reference (absolute or relative, depends on m_paramtype)
 	double		m_dblValue;	// Value (m_paramtype == t_Value)
 
 
 	// Retrieve the resolved value (= references are resolved)
-	double GetValue(std::vector<double> & vdblNoteFrequenciesHz, long lMyIndex) const
+	double GetValue(std::vector<double> & vdblNoteFrequenciesHz, long scaleNoteNumber) const
 	{
 		switch ( m_paramtype )
 		{
 		case t_AbsRef:	return vdblNoteFrequenciesHz.at(m_lRef);
-		case t_RelRef:	return vdblNoteFrequenciesHz.at(lMyIndex + m_lRef);
+		case t_RelRef:	return vdblNoteFrequenciesHz.at(scaleNoteNumber + m_lRef);
 		default:		return m_dblValue;
 		}
 	}
@@ -98,7 +98,7 @@ struct SRVParam
 
 
 // Handling of formulas
-class CFormula  
+class CFormula
 {
 public:
 	// At construction time, the note index, the formula refers to, must be given.
@@ -254,45 +254,64 @@ public:
 	// Apply formula to vector of note frequencies
 	void Apply(std::vector<double> & vdblNoteFrequenciesHz) const
 	{
-		long	lInc = ( m_lLoop >= 0 ? +1 : -1 );
-		long	l = 0;
+		// Gets the sign of the amount of times to loop
+		// The sign will determine which direction to loop
+		long lInc = ( m_lLoop >= 0 ? +1 : -1 );
+		long l = 0;
 		do
 		{
-			long	lIndex = m_lMyIndex + l;
-			if ( (lIndex < 0) || (lIndex >= MaxNumOfNotes) )
+			// The current note index in regards to the entire scale
+			long	scaleNoteIndex = m_lMyIndex + l;
+			// scaleNoteIndex can never be greater than MaxNumOfNotes, as vector
+			// 		vdblNoteFrequenciesHz's size is of MaxNumOfNotes
+			if ( (scaleNoteIndex < 0) || (scaleNoteIndex >= MaxNumOfNotes) )
 				break;
 
+			// Shift entire scale instead of setting it, as the ! token has been used
 			if ( m_dblEnsureHz > 0 )
 			{
-				double	dblFactor = m_dblEnsureHz / vdblNoteFrequenciesHz.at(lIndex);
+				double	dblFactor = m_dblEnsureHz / vdblNoteFrequenciesHz.at(scaleNoteIndex);
 				for ( long i = 0 ; i < MaxNumOfNotes ; ++i )
 					vdblNoteFrequenciesHz.at(i) *= dblFactor;
 			}
-			else
+			else // ! token hasn't been used.
 			{
-				// First resolve RV-Parameters
-				double	dblRangeHz = m_rvpRangeHz.GetValue(vdblNoteFrequenciesHz, lIndex);
-				double	dblShiftHz = m_rvpShiftHz.GetValue(vdblNoteFrequenciesHz, lIndex);
+				// First resolve RV-Parameters (token #)
+				// If #= : Gets the frequency of another note in the scale,
+				// 		where the index was a single number (Absolute reference)
+				// If #> : Gets the frequency of another note in the scale,
+				// 		where that index is the current note index offset by an integer
+				// (Relative reference)
+				double	dblRangeHz = m_rvpRangeHz.GetValue(vdblNoteFrequenciesHz, scaleNoteIndex);
+				// Token +
+				double	dblShiftHz = m_rvpShiftHz.GetValue(vdblNoteFrequenciesHz, scaleNoteIndex);
 
 				// Calculate
-				vdblNoteFrequenciesHz.at(lIndex) =
+				vdblNoteFrequenciesHz.at(scaleNoteIndex) =
 					dblRangeHz * m_dblMUL / m_dblDIV * pow(2, m_dblCENTS/1200) + dblShiftHz;
 			}
 			l += lInc;
-		} while ( abs(l) < abs(m_lLoop) );
+		} while ( std::abs(l) < std::abs(m_lLoop) );
 	}
 
-
-
+// Parameters of the formula
 private:
-	// Parameters of the formula
+	// The note index the formula is refering to
+	// All formulas must be refering to a note number
 	long		m_lMyIndex;
+	// Ensure frequency in Hz at the note number this formula is associated with
+	// 		(m_lMyIndex) by shifting the scale
+	// Assigned from ! token
 	double		m_dblEnsureHz;
+	// Set using # token
 	SRVParam	m_rvpRangeHz;
 	double		m_dblMUL;
 	double		m_dblDIV;
 	double		m_dblCENTS;
+	// Set using + token
 	SRVParam	m_rvpShiftHz;
+	// Loop number provided with ~ token
+	// Number of times a function should be repeated
 	long		m_lLoop;
 };
 
