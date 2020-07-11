@@ -18,6 +18,7 @@ The following file types are known to be _writable_ with this library:
 
 - AnaMark tuning (_.tun_)
 - AnaMark multiple scales tuning (_.msf_)
+- HTML (for scale distribution and sharing)
 
 ## License (X11 license type; also known as MIT license)
 
