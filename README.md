@@ -6,7 +6,8 @@ Originally developed and maintained by Mark Henning in 2009, this C++ library is
 
 ## Features
 
-This library (should) be fully compliant with the [AnaMark tuning file format V2.00](https://www.mark-henning.de/files/am/Tuning_File_V2_Doc.pdf) (Also see section **Goals**).
+This library (should) be fully compliant with the [AnaMark tuning file format V2.00](https://www.mark-henning.de/files/am/Tuning_File_V2_Doc.pdf) 
+(Also see section **Goals**).
 
 The following file types are known to be _readable_ with this library:
 
@@ -19,6 +20,86 @@ The following file types are known to be _writable_ with this library:
 - AnaMark tuning (_.tun_)
 - AnaMark multiple scales tuning (_.msf_)
 - HTML (for scale distribution and sharing)
+
+## Building the Library and Tests as Standalone Assets
+
+The AnaMark Tuning Library uses CMake to configure and build the solution.
+CMake is a widely available open source build configuraiton tool which can 
+create build assets for the development environment of your choice. You can
+install it from [cmake.org](https://cmake.org); if you install VS2017 or 2019
+you already have it; you can easily install it with homebrew on mac or apt on
+linux. 
+
+But once it is installed the recipe is simple. Run cmake to make your build
+assets, and either then open those build assets or run cmake to run a build.
+
+### Windows
+
+Open a Visual Studio command prompt. Check out this code and change to the
+directory. Type
+
+```
+cmake -Bbuild
+```
+
+and you will have in your build directory a visual studio solutions file which
+will allow you to create the library or test targets or you can build on the 
+command line with
+
+```
+cmake --build build --config Release
+```
+
+### macOS
+
+Run CMake to create xcode assets. For example
+
+```
+cmake -Bbuild -GXcode
+```
+
+You will then have an xcode file in the 'build' directory which you can
+open and use with xcode.  
+
+If you choose, you can build in xcode or from the command line with
+
+```
+cmake --build build --config Release 
+```
+
+Command line builds have far more readable output if you install
+and use the optional '[xcpretty](https://github.com/xcpretty/xcpretty)' utility.
+
+```
+cmake --build build --config Release | xcpretty
+```
+
+### Linux
+
+Very similar.
+
+```
+cmake -Bbuild
+cmake --build build --config Release
+```
+
+
+
+
+## Using the library in your code
+
+There are a variety of ways to use the library in your code. The two most common are
+
+1. Build the static library in a standalone fashion and set your include path to
+   the source directory
+2. Make this module a git submodule of your project and build and include the appropriate
+   source.
+
+This section will be expanded in the near future.
+
+## Building the documentation
+
+
 
 ## License (X11 license type; also known as MIT license)
 

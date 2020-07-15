@@ -1,3 +1,5 @@
+/// \file
+// 
 // SCL_Import.cpp: Implementierung der Klasse CSCL_Import.
 //
 // (C)opyright in 2009 by Mark Henning, Germany
