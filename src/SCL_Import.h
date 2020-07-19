@@ -13,23 +13,13 @@
 #if !defined(AFX_SCL_Import_H__343D6998_CC30_4408_A585_1266F47A0DB6__INCLUDED_)
 #define AFX_SCL_Import_H__343D6998_CC30_4408_A585_1266F47A0DB6__INCLUDED_
 
-
-
 #include <fstream>
 #include <string>
 
 #include "TUN_MultiScaleFile.h"
 
-
-
-
-
 namespace TUN
 {
-
-
-
-
 
 class CSCL_Import  
 {
@@ -37,12 +27,8 @@ public:
 	CSCL_Import();
 	virtual ~CSCL_Import();
 
-
-
 	void	ResetTuning();
 	void	ResetMapping();
-
-
 
 	// Error handling
 	const CErr &	Err() const { return m_err; }
@@ -50,17 +36,17 @@ private:
 	CErr	m_err;
 public:
 
-
-
 	// Handling of Scala Keyboard Mapping files
 	bool			ReadKBM(const char * szFilepath);
 private:
 	bool			ReadKBM(std::istream & istr, CStringParser & strparser);
 public:
 
-
-
-	// Handling of Scala tuning files
+    /**
+     * Read an SCL scale file
+     *
+     * Parse and configure this object to match the given SCL file
+     */
 	bool			ReadSCL(const char * szFilepath);
 private:
 	bool			ReadSCL(std::istream & istr, CStringParser & strparser);

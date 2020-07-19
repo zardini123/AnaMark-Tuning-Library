@@ -24,3 +24,10 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# directory I recommend for cmake
+build/
+buildwin/
+buildlin/
+buildmac/
+buildarm/
