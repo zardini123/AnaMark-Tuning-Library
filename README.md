@@ -21,25 +21,84 @@ The following file types are known to be _writable_ with this library:
 - AnaMark multiple scales tuning (_.msf_)
 - HTML (for scale distribution and sharing)
 
-## Building the Library and Tests as Standalone Assets
+## License (X11 license type; also known as MIT license)
+
+Full license is provided in file [LICENSE.md](LICENSE.md).
+
+## Using the library in your code
+
+There are a variety of ways to use the library in your code. The two most common are
+
+1. Build the static library in a standalone fashion and set your include path to
+   the source directory
+2. Make this module a git submodule of your project and build and include the appropriate
+   source.
+
+This section will be expanded in the near future.
+
+## Goals
+
+The goal of this repository is to continue to maintain Mark Henning's original library source, and ensure its compatibility with modern compilers and systems. Changes made to the source must still result in being fully compliant with Mark's AnaMark tuning file format specifications.
+Along with that main mission, this repository also aims to
+
+- Fully test (have full code coverage)
+- Migrate original code to use standard library (std) calls that are platform independent
+- Provide full documentation for future users
+
+
+## Building _(library standalone assets, test executable, and documentation)_
+
+### Preparing for building
 
 The AnaMark Tuning Library uses CMake to configure and build the solution.
 CMake is a widely available open source build configuraiton tool which can 
 create build assets for the development environment of your choice. You can
-install it from [cmake.org](https://cmake.org); if you install VS2017 or 2019
-you already have it; you can easily install it with homebrew on mac or apt on
-linux. 
+install it from [cmake.org](https://cmake.org); 
 
-But once it is installed the recipe is simple. Run cmake to make your build
-assets, and either then open those build assets or run cmake to run a build.
+_Installing cmake:_
 
-### Windows
+**Windows:**
+**macOS:**  `brew install cmake`
+**Linux:**
+
+### Preparing for building documentation
+
+To build the documentation, ensure _doxygen_ is installed on your system before running the steps for building the library standalone assets.
+
+_Installing doxygen:_
+
+**Windows:**
+**macOS:**  `brew install doxygen`  (`brew` is a macOS package manager, download [here](https://brew.sh))
+**Linux:**
+
+### Platform-agnostic building
+
+The following steps can be performed easily on Windows, macOS, and Linux once _cmake_ is installed (and if you want documentation, _doxygen_ too).
+
+0) Clone / download this repository
+1) Set your current directory to the root folder of this library
+2) Run the build commands
+
+```
+cmake -B build
+cmake --build build --config Release
+```
+
+### Results of build
+
+If _doxygen_ was properly installed on your system, you can access the documentation by opening file `build/docs/html/index.html` in your favorite browser.
+
+### Platform-specific building
+
+If you want more fine control with building this library, follow these steps on your platform.
+
+**Windows:**
 
 Open a Visual Studio command prompt. Check out this code and change to the
 directory. Type
 
 ```
-cmake -Bbuild
+cmake -B build
 ```
 
 and you will have in your build directory a visual studio solutions file which
@@ -50,12 +109,12 @@ command line with
 cmake --build build --config Release
 ```
 
-### macOS
+**macOS:**
 
 Run CMake to create xcode assets. For example
 
 ```
-cmake -Bbuild -GXcode
+cmake -B build -G Xcode
 ```
 
 You will then have an xcode file in the 'build' directory which you can
@@ -74,61 +133,6 @@ and use the optional '[xcpretty](https://github.com/xcpretty/xcpretty)' utility.
 cmake --build build --config Release | xcpretty
 ```
 
-### Linux
+**Linux:**
 
-Very similar.
-
-```
-cmake -Bbuild
-cmake --build build --config Release
-```
-
-
-
-
-## Using the library in your code
-
-There are a variety of ways to use the library in your code. The two most common are
-
-1. Build the static library in a standalone fashion and set your include path to
-   the source directory
-2. Make this module a git submodule of your project and build and include the appropriate
-   source.
-
-This section will be expanded in the near future.
-
-## Building the documentation
-
-
-
-## License (X11 license type; also known as MIT license)
-
-Copyright (C) 2009 Mark Henning, Germany, http://www.mark-henning.de
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-## Goals
-
-The goal of this repository is to continue to maintain Mark Henning's original library source, and ensure its compatibility with modern compilers and systems. Changes made to the source must still result in being fully compliant with Mark's AnaMark tuning file format specifications.
-Along with that main mission, this repository also aims to
-
-- Fully test (have full code coverage)
-- Migrate original code to use standard library (std) calls that are platform independent
-- Provide full documentation for future users
+Identical to steps provided in section [Platform-agnostic building](#platform-agnostic-building).
