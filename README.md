@@ -1,4 +1,4 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/zardini123/AnaMark-Tuning-Library.svg?branch=master)](https://travis-ci.org/zardini123/AnaMark-Tuning-Library) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # AnaMark C++ Tuning Library
 
@@ -6,7 +6,7 @@ Originally developed and maintained by Mark Henning in 2009, this C++ library is
 
 ## Features
 
-This library (should) be fully compliant with the [AnaMark tuning file format V2.00](https://www.mark-henning.de/files/am/Tuning_File_V2_Doc.pdf) 
+This library (should) be fully compliant with the [AnaMark tuning file format V2.00](https://www.mark-henning.de/files/am/Tuning_File_V2_Doc.pdf)
 (Also see section **Goals**).
 
 The following file types are known to be _readable_ with this library:
@@ -45,21 +45,20 @@ Along with that main mission, this repository also aims to
 - Migrate original code to use standard library (std) calls that are platform independent
 - Provide full documentation for future users
 
-
 ## Building _(library standalone assets, test executable, and documentation)_
 
 ### Preparing for building
 
 The AnaMark Tuning Library uses CMake to configure and build the solution.
-CMake is a widely available open source build configuraiton tool which can 
+CMake is a widely available open source build configuraiton tool which can
 create build assets for the development environment of your choice. You can
-install it from [cmake.org](https://cmake.org); 
+install it from [cmake.org](https://cmake.org);
 
 _Installing cmake:_
 
-**Windows:**
-**macOS:**  `brew install cmake`
-**Linux:**
+- **Windows:**
+- **macOS:** `brew install cmake`
+- **Linux:**
 
 ### Preparing for building documentation
 
@@ -67,17 +66,17 @@ To build the documentation, ensure _doxygen_ is installed on your system before 
 
 _Installing doxygen:_
 
-**Windows:**
-**macOS:**  `brew install doxygen`  (`brew` is a macOS package manager, download [here](https://brew.sh))
-**Linux:**
+- **Windows:**
+- **macOS:** `brew install doxygen` (`brew` is a macOS package manager, download [here](https://brew.sh))
+- **Linux:**
 
 ### Platform-agnostic building
 
 The following steps can be performed easily on Windows, macOS, and Linux once _cmake_ is installed (and if you want documentation, _doxygen_ too).
 
-0) Clone / download this repository
-1) Set your current directory to the root folder of this library
-2) Run the build commands
+0. Clone / download this repository
+1. Set your current directory to the root folder of this library
+1. Run the build commands
 
 ```
 cmake -B build
@@ -102,7 +101,7 @@ cmake -B build
 ```
 
 and you will have in your build directory a visual studio solutions file which
-will allow you to create the library or test targets or you can build on the 
+will allow you to create the library or test targets or you can build on the
 command line with
 
 ```
@@ -118,12 +117,12 @@ cmake -B build -G Xcode
 ```
 
 You will then have an xcode file in the 'build' directory which you can
-open and use with xcode.  
+open and use with xcode.
 
 If you choose, you can build in xcode or from the command line with
 
 ```
-cmake --build build --config Release 
+cmake --build build --config Release
 ```
 
 Command line builds have far more readable output if you install

@@ -10,6 +10,7 @@ compiler:
 
 before_script:
   - cmake --version
+  - mkdir build
   - cmake -B build
   - cmake --build build --config Release
 
