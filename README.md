@@ -79,7 +79,7 @@ The following steps can be performed easily on Windows, macOS, and Linux once _c
 1. Run the build commands
 
 ```
-cmake -B build
+cmake -Bbuild
 cmake --build build --config Release
 ```
 
