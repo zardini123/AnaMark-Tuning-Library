@@ -1,0 +1,17 @@
+language: cpp
+
+os:
+  - windows
+  - linux
+  - osx
+
+compiler:
+  - cmake
+
+before_script:
+  - $COMPILER --version
+  - cmake --version
+  - cmake -B build
+
+script:
+  - cmake --build build --config Release
