@@ -1,5 +1,15 @@
 language: cpp
 
+dist: bionic
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-6
+      - g++-6
+      - cmake
+
 os:
   - windows
   - linux
