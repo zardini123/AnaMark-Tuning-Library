@@ -6,21 +6,26 @@ matrix:
   include:
     - os: linux
       compiler: cmake
+      before_script:
+        - mkdir build
+        - cd build
+        - cmake -DCMAKE_BUILD_TYPE=Release ..
+        - make --version
+        - ls
+        - make
+        - cd ..
     - os: osx
       compiler: cmake
+      before_script:
+        - cmake -B build
+        - cmake --build build --config Release
     - os: windows
       compiler: cmake
-      before_install:
-        - choco install make
-
-before_script:
-  - mkdir build
-  - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Release ..
-  - make --version
-  - ls
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then msbuild Project.sln; else make; fi
-  - cd ..
+      # before_install:
+      #   - choco install make
+      before_script:
+        - cmake -B build
+        - cmake --build build --config Release
 
 script:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then .\\build\\Release\\anamark-tuning-test.exe; else ./build/anamark-tuning-test; fi
