@@ -1,37 +1,21 @@
+# Great example travis.yml for many compiler versions https://github.com/taocpp/PEGTL/blob/master/.travis.yml
+
 language: cpp
 
-# Cmake version on Travis-CI linux is old.  Update it.
-addons:
-  apt:
-    packages:
-      - cmake
-    sources:
-      - kalakris-cmake
-
-os:
-  - windows
-  - linux
-  - osx
-
-compiler:
-  - cmake
-
-install:
-  ############################################################################
-  # Install a recent CMake
-  ############################################################################
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v3.18.1/cmake-3.18.1-Linux-x86_64.tar.gz"
-      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
-      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-    fi
-  - cmake --version
+matrix:
+  include:
+    - os: linux
+      compiler: cmake
+    - os: osx
+      compiler: cmake
+    - os: windows
+      compiler: cmake
 
 before_script:
   - mkdir build
-  - cmake -B build
-  - cmake --build build --config Release
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release ..
+  - make
 
 script:
   - if [ "$TRAVIS_OS_NAME" = "windows" ]; then .\\build\\Release\\anamark-tuning-test.exe; else ./build/anamark-tuning-test; fi
