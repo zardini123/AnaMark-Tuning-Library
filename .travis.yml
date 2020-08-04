@@ -9,8 +9,9 @@ compiler:
   - cmake
 
 before_script:
-  - cmake -B build .
+  - mkdir build
+  - cmake -B build
   - cmake --build build --config Release
 
 script:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then .\build\Release\anamark-tuning-test.exe; else ./build/anamark-tuning-test; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then .\\build\\Release\\anamark-tuning-test.exe; else ./build/anamark-tuning-test; fi
