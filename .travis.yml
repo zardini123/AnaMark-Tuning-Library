@@ -17,7 +17,9 @@ before_script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=Release ..
-  - make
+  - make --version
+  - ls
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then msbuild Project.sln; else make; fi
   - cd ..
 
 script:
