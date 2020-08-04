@@ -18,4 +18,4 @@ before_script:
   - make
 
 script:
-  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then .\\build\\Release\\anamark-tuning-test.exe; else ./build/anamark-tuning-test; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then .\\Release\\anamark-tuning-test.exe; else ./anamark-tuning-test; fi
