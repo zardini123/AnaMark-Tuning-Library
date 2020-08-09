@@ -10,9 +10,12 @@ project(Anamark-Tuning-Library VERSION 0.9.0.0 LANGUAGES CXX)
 message( STATUS "Compiler Version is ${CMAKE_CXX_COMPILER_VERSION}" )
 
 # Code Coverage Configuration
-include(cmake/CodeCoverage.cmake)
-append_coverage_compiler_flags()
-setup_target_for_coverage_lcov(NAME anamark-tuning-library_coverage EXECUTABLE anamark-tuning-test DEPENDENCIES anamark-tuning-test)
+option(CODE_COVERAGE "Enable coverage reporting" OFF)
+if(CODE_COVERAGE)
+  include(cmake/CodeCoverage.cmake)
+  append_coverage_compiler_flags()
+  setup_target_for_coverage_lcov(NAME anamark-tuning-library_coverage EXECUTABLE anamark-tuning-test DEPENDENCIES anamark-tuning-test)
+endif()
 
 add_library( anamark-tuning-library STATIC )
 target_sources( anamark-tuning-library PRIVATE

@@ -16,7 +16,8 @@ jobs:
         - doxygen -v
         - mkdir build
         - cd build
-        - cmake -DCMAKE_BUILD_TYPE=Release ..
+        # Option -D CODE_COVERAGE=ON generates target anamark-tuning-library_coverage
+        - cmake -D CMAKE_BUILD_TYPE=Release -D CODE_COVERAGE=ON ..
         - ls
         - make
         # Generate coverage reports
