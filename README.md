@@ -36,6 +36,10 @@ There are a variety of ways to use the library in your code. The two most common
 
 This section will be expanded in the near future.
 
+## Documentation
+
+The documentation providing description of this library's API and how to use it can be found on this repository's Github Page ([here](https://zardini123.github.io/AnaMark-Tuning-Library/)).
+
 ## Goals
 
 The goal of this repository is to continue to maintain Mark Henning's original library source, and ensure its compatibility with modern compilers and systems. Changes made to the source must still result in being fully compliant with Mark's AnaMark tuning file format specifications.
@@ -50,7 +54,7 @@ Along with that main mission, this repository also aims to
 ### Preparing for building
 
 The AnaMark Tuning Library uses CMake to configure and build the solution.
-CMake is a widely available open source build configuraiton tool which can
+CMake is a widely available open source build configuration tool which can
 create build assets for the development environment of your choice. You can
 install it from [cmake.org](https://cmake.org);
 
