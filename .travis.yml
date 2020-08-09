@@ -6,6 +6,30 @@ matrix:
   include:
     - os: linux
       compiler: cmake
+      # branches:
+      #   only:
+      #     - master
+      addons:
+        apt:
+          packages:
+            - doxygen
+      before_script:
+        - mkdir build
+        - cd build
+        - cmake -DCMAKE_BUILD_TYPE=Release ..
+        - make --version
+        - ls
+        - make
+        - cd ..
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        local_dir: build/docs/html
+        github_token: $GH_REPO_TOKEN
+        # on:
+        #   branch: master
+    - os: linux
+      compiler: cmake
       before_script:
         - mkdir build
         - cd build
