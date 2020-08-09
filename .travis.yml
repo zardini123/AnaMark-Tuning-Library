@@ -28,6 +28,7 @@ jobs:
         token: $GH_REPO_TOKEN
         keep_history: true
         strategy: git
+        edge: true
         on:
           branch: develop
     - os: linux
