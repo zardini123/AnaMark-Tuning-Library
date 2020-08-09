@@ -1,7 +1,5 @@
 # Great example travis.yml for many compiler versions https://github.com/taocpp/PEGTL/blob/master/.travis.yml
 
-sudo: false
-
 language: cpp
 
 jobs:
@@ -24,12 +22,11 @@ jobs:
         - ls
         - make
         - cd ..
-      before_deploy:
-        - ls /home/travis/build/zardini123/AnaMark-Tuning-Library/build/docs/html
       deploy:
         provider: pages
-        local_dir: build/docs/html
+        local_dir: build/docs/html/
         token: $GH_REPO_TOKEN
+        keep_history: true
         strategy: git
         on:
           branch: develop
