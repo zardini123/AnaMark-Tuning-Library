@@ -19,9 +19,12 @@ jobs:
         # Option -D CODE_COVERAGE=ON generates target anamark-tuning-library_coverage
         - cmake -D CMAKE_BUILD_TYPE=Release -D CODE_COVERAGE=ON ..
         - ls
-        - make
+        # Constant directory-changing workaround for tests to get the test exectuable to find the test .scl/.kbm files
+        - cd ..
+        - make -C build/
         # Generate coverage reports
-        - make anamark-tuning-library_coverage
+        - make -C build/ anamark-tuning-library_coverage
+        - cd build/
         # Create lcov report
         - lcov --capture --directory . --output-file coverage.info
         - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter system-files
