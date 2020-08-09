@@ -1,11 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12 CACHE STRING "Build for 10.12")
 
-set(CMAKE_CXX_EXTENSIONS false)
+# Use C++14
 set(CMAKE_CXX_STANDARD 14)
+# Don't use e.g. GNU extension (like -std=gnu++11) for portability
+set(CMAKE_CXX_EXTENSIONS false)
 
 project(Anamark-Tuning-Library VERSION 0.9.0.0 LANGUAGES CXX)
 message( STATUS "Compiler Version is ${CMAKE_CXX_COMPILER_VERSION}" )
+
+# Code Coverage Configuration
+include(cmake/CodeCoverage.cmake)
+append_coverage_compiler_flags()
+setup_target_for_coverage_lcov(NAME anamark-tuning-library_coverage EXECUTABLE anamark-tuning-test DEPENDENCIES anamark-tuning-test)
 
 add_library( anamark-tuning-library STATIC )
 target_sources( anamark-tuning-library PRIVATE

@@ -6,21 +6,27 @@ jobs:
   include:
     - os: linux
       compiler: cmake
-      # branches:
-      #   only:
-      #     - master
       addons:
         apt:
           packages:
             - doxygen
+            - lcov
       before_script:
+        - make --version
         - doxygen -v
         - mkdir build
         - cd build
         - cmake -DCMAKE_BUILD_TYPE=Release ..
-        - make --version
         - ls
         - make
+        # Generate coverage reports
+        - make anamark-tuning-library_coverage
+        # Create lcov report
+        - lcov --capture --directory . --output-file coverage.info
+        - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter system-files
+        - lcov --list coverage.info # debug info
+        # Uploading report to CodeCov
+        - bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
         - cd ..
       deploy:
         provider: pages
@@ -28,19 +34,10 @@ jobs:
         token: $GH_REPO_TOKEN
         keep_history: true
         strategy: git
+        # Opt into deployment tooling (dpl) version 2
         edge: true
         on:
           branch: develop
-    - os: linux
-      compiler: cmake
-      before_script:
-        - mkdir build
-        - cd build
-        - cmake -DCMAKE_BUILD_TYPE=Release ..
-        - make --version
-        - ls
-        - make
-        - cd ..
     - os: osx
       compiler: cmake
       before_script:
