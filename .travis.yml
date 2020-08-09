@@ -2,7 +2,7 @@
 
 language: cpp
 
-matrix:
+jobs:
   include:
     - os: linux
       compiler: cmake
@@ -23,11 +23,11 @@ matrix:
         - cd ..
       deploy:
         provider: pages
-        skip_cleanup: true
         local_dir: build/docs/html
-        github_token: $GH_REPO_TOKEN
-        # on:
-        #   branch: master
+        token: $GH_REPO_TOKEN
+        strategy: git
+        on:
+          branch: develop
     - os: linux
       compiler: cmake
       before_script:
