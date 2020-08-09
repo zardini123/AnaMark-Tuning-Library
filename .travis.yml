@@ -21,9 +21,12 @@ jobs:
         - make --version
         - ls
         - make
-        - ls docs/
-        - ls docs/html/
         - cd ..
+      before_deploy:
+        - echo $PWD
+        - ls build/
+        - ls build/docs/
+        - ls build/docs/html/
       deploy:
         provider: pages
         local_dir: build/docs/html
