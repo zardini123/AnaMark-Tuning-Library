@@ -14,12 +14,15 @@ jobs:
           packages:
             - doxygen
       before_script:
+        - doxygen -v
         - mkdir build
         - cd build
         - cmake -DCMAKE_BUILD_TYPE=Release ..
         - make --version
         - ls
         - make
+        - ls docs/
+        - ls docs/html/
         - cd ..
       deploy:
         provider: pages
