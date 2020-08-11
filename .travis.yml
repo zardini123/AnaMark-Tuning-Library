@@ -20,8 +20,8 @@ jobs:
         - cmake -D CMAKE_BUILD_TYPE=Release -D CODE_COVERAGE=ON ..
         - ls
         - make
-        # Documentation coverage
-        - python ../cmake/doxy-coverage.py ../build/docs/xml/ --badgelocation ../build/docs/html
+        # Documentation coverage (pass with even 0 documentation coverage)
+        - python ../cmake/doxy-coverage.py ../build/docs/xml/ --badgelocation ../build/docs/html --threshold 0
         # Generate coverage reports
         - export ANAMARK_TEST_DATA_DIRECTORY=../tests/data/
         - make anamark-tuning-library_coverage
