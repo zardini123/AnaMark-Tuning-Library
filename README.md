@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/zardini123/AnaMark-Tuning-Library.svg?branch=master)](https://travis-ci.org/zardini123/AnaMark-Tuning-Library) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/zardini123/AnaMark-Tuning-Library.svg?branch=master)](https://travis-ci.org/zardini123/AnaMark-Tuning-Library) [![codecov](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library/branch/master/graph/badge.svg)](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # AnaMark C++ Tuning Library
 
