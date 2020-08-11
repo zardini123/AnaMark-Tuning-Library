@@ -218,6 +218,7 @@ def main():
 
         imgurl = "https://raster.shields.io/badge/Documentation-%25" + str(total_per) + "-" + color
         urllib.urlretrieve(imgurl, ns.badgelocation + "documentation_coverage_badge.png")
+        print("Created badge at " + ns.badgelocation + "documentation_coverage_badge.png")
 
     err = (ns.threshold - total_per, 0)[total_per > ns.threshold]
     if ns.noerror:
