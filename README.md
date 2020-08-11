@@ -1,4 +1,7 @@
-[![Build Status](https://travis-ci.org/zardini123/AnaMark-Tuning-Library.svg?branch=master)](https://travis-ci.org/zardini123/AnaMark-Tuning-Library) [![codecov](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library/branch/master/graph/badge.svg)](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/zardini123/AnaMark-Tuning-Library.svg?branch=master)](https://travis-ci.org/zardini123/AnaMark-Tuning-Library)
+[![codecov](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library/branch/master/graph/badge.svg)](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library)
+[![Documentation Coverage](https://zardini123.github.io/AnaMark-Tuning-Library/documentation_coverage_badge.png)](https://zardini123.github.io/AnaMark-Tuning-Library/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # AnaMark C++ Tuning Library
 
@@ -83,9 +86,11 @@ The following steps can be performed easily on Windows, macOS, and Linux once _c
 1. Run the build commands
 
 ```
-cmake -Bbuild
+cmake -B build
 cmake --build build --config Release
 ```
+
+_(NOTE: Cmake option -B requires Cmake version 3.13 or above)_
 
 ### Results of build
 
