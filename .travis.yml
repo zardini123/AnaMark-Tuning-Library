@@ -19,12 +19,10 @@ jobs:
         # Option -D CODE_COVERAGE=ON generates target anamark-tuning-library_coverage
         - cmake -D CMAKE_BUILD_TYPE=Release -D CODE_COVERAGE=ON ..
         - ls
-        # Constant directory-changing workaround for tests to get the test exectuable to find the test .scl/.kbm files
-        - cd ..
-        - make -C build/
+        - make
         # Generate coverage reports
-        - make -C build/ anamark-tuning-library_coverage
-        - cd build/
+        - ANAMARK_TEST_DATA_DIRECTORY=$TRAVIS_BUILD_DIR/tests/data
+        - make anamark-tuning-library_coverage
         # Create lcov report
         - lcov --capture --directory . --output-file coverage.info
         - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter system-files
