@@ -21,7 +21,7 @@ jobs:
         - ls
         - make
         # Generate coverage reports
-        - export ANAMARK_TEST_DATA_DIRECTORY=../tests/data
+        - export ANAMARK_TEST_DATA_DIRECTORY=../tests/data/
         - make anamark-tuning-library_coverage
         # Create lcov report
         - lcov --capture --directory . --output-file coverage.info
