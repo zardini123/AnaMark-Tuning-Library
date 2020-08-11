@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 std::string TestUtils::testFile(std::string fn) {
-    const char* dir = getenv( "ANAMARK_TUNING_TEST_DIRECTORY" );
+    const char* dir = getenv( "ANAMARK_TEST_DATA_DIRECTORY" );
     std::string td;
     if( ! dir )
         td = "tests/data/";

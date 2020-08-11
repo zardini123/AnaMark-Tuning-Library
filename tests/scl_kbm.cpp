@@ -7,7 +7,7 @@ TEST_CASE( "Can Find Test Files" )
     SECTION( "Can fopen a test File" )
     {
         auto f = TestUtils::testFile( "12-intune.scl" );
-        INFO( "Trying to open '" << f << "'. If this fails try setting ANAMARK_TUNING_TEST_DIRECTORY" );
+        INFO( "Trying to open '" << f << "'. If this fails try setting ANAMARK_TEST_DATA_DIRECTORY" );
         auto p = fopen( f.c_str(), "r" );
         bool canOpen = p != nullptr;
         if( p )
