@@ -28,6 +28,7 @@ target_include_directories( anamark-tuning-library PRIVATE src )
 add_executable( anamark-tuning-test )
 target_sources( anamark-tuning-test PRIVATE
   tests/main.cpp
+  tests/testutils.cpp
   tests/basics.cpp
   tests/scl_kbm.cpp
   )

@@ -1,8 +1,19 @@
 #include "catch2.hpp"
 #include "AnaMark-Tuning-Library.h"
+#include "testutils.h"
 
-std::string testFile(std::string fn) {
-    return std::string( "tests/data/" ) + fn;
+TEST_CASE( "Can Find Test Files" )
+{
+    SECTION( "Can fopen a test File" )
+    {
+        auto f = TestUtils::testFile( "12-intune.scl" );
+        INFO( "Trying to open '" << f << "'. If this fails try setting ANAMARK_TEST_DATA_DIRECTORY" );
+        auto p = fopen( f.c_str(), "r" );
+        bool canOpen = p != nullptr;
+        if( p )
+            fclose(p);
+        REQUIRE( canOpen );
+    }
 }
 
 TEST_CASE( "SCL KBM Basic Classes" )
@@ -10,7 +21,7 @@ TEST_CASE( "SCL KBM Basic Classes" )
     SECTION( "12-intune test" )
     {
         TUN::CSCL_Import scli;
-        REQUIRE( scli.ReadSCL( testFile( "12-intune.scl" ).c_str() ) );
+        REQUIRE( scli.ReadSCL( TestUtils::testFile( "12-intune.scl" ).c_str() ) );
         REQUIRE( scli.Err().IsOK() );
 
         TUN::CSingleScale s;
