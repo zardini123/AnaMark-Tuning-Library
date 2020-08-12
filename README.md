@@ -40,18 +40,24 @@ There are a variety of ways to use the library in your code. The two most common
 
 This section will be expanded in the near future.
 
-## Documentation
+## Documentation and Community
 
 The documentation providing description of this library's API and how to use it can be found on this repository's Github Page ([here](https://zardini123.github.io/AnaMark-Tuning-Library/)).
+
+If you are interested in microtonal and/or xenharmonic music, interested in discussing tuning file formats/specifications, or you have questions about this library, its application, and how to use it, come chat with us on our Discord server! ([Click to open invite link](https://discord.gg/4WXbgcx))
 
 ## Goals
 
 The goal of this repository is to continue to maintain Mark Henning's original library source, and ensure its compatibility with modern compilers and systems. Changes made to the source must still result in being fully compliant with Mark's AnaMark tuning file format specifications.
 Along with that main mission, this repository also aims to
 
-- Fully test (have full code coverage)
 - Migrate original code to use standard library (std) calls that are platform independent
+- Ensure this library can compile on many different environments
+  - This badge [![Build Status](https://travis-ci.org/zardini123/AnaMark-Tuning-Library.svg?branch=master)](https://travis-ci.org/zardini123/AnaMark-Tuning-Library) should state "passing" to signify that each environment in Travis-CI (click the badge) can compile the library
+- Fully test this library (i.e. have full code coverage)
+  - This badge [![codecov](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library/branch/master/graph/badge.svg)](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library) should be at 100% to signify full code coverage.
 - Provide full documentation for future users
+  - This badge [![Documentation Coverage](https://zardini123.github.io/AnaMark-Tuning-Library/documentation_coverage_badge.png)](https://zardini123.github.io/AnaMark-Tuning-Library/) should be at 100% to signify all functions in the library have documentation associated with it.
 
 ## Building _(library standalone assets, test executable, and documentation)_
 
@@ -65,7 +71,7 @@ install it from [cmake.org](https://cmake.org);
 _Installing cmake:_
 
 - **Windows:**
-- **macOS:** `brew install cmake`
+- **macOS:** `brew install cmake` (`brew` is a macOS package manager, download [here](https://brew.sh))
 - **Linux:**
 
 ### Preparing for building documentation
@@ -75,7 +81,7 @@ To build the documentation, ensure _doxygen_ is installed on your system before 
 _Installing doxygen:_
 
 - **Windows:**
-- **macOS:** `brew install doxygen` (`brew` is a macOS package manager, download [here](https://brew.sh))
+- **macOS:** `brew install doxygen`
 - **Linux:**
 
 ### Platform-agnostic building
