@@ -216,7 +216,7 @@ def main():
         elif total_per_int in range(95, 101):
             color = "brightgreen"
 
-        imgurl = "https://raster.shields.io/badge/Documentation-%25" + str(total_per) + "-" + color
+        imgurl = "https://raster.shields.io/badge/Documentation-" + str(total_per) + "%25-" + color
         urllib.urlretrieve(imgurl, ns.badgelocation + "documentation_coverage_badge.png")
         print("Created badge at " + ns.badgelocation + "documentation_coverage_badge.png")
 

@@ -2,6 +2,7 @@
 [![codecov](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library/branch/master/graph/badge.svg)](https://codecov.io/gh/zardini123/AnaMark-Tuning-Library)
 [![Documentation Coverage](https://zardini123.github.io/AnaMark-Tuning-Library/documentation_coverage_badge.png)](https://zardini123.github.io/AnaMark-Tuning-Library/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Discord](https://img.shields.io/discord/743153714608734308.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/4WXbgcx)
 
 # AnaMark C++ Tuning Library
 
