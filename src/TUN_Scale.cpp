@@ -808,6 +808,8 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 				if ( !CheckType(strValue, m_strFormatSpecs) )
 					return -1;
 				break;
+			default:
+				break;
 			}
 			break;
 
@@ -906,6 +908,8 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 				if ( !CheckType(strValue, m_strComments) )
 					return -1;
 				break;
+			default:
+				break;
 			}
 			break;
 
@@ -929,6 +933,8 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 				// Originally used __max, a windows only function macro
 				// 	#define __max(a,b) (((a) > (b)) ? (a) : (b))
 				lET_LastNoteFound = std::max(lET_LastNoteFound, lKeyIndex);
+				break;
+			default:
 				break;
 			}
 			break;
@@ -981,6 +987,8 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 					AddFormula(formula);
 				}
 				break;
+			default:
+				break;
 			}
 			break;
 
@@ -1004,7 +1012,8 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 					return -1;
 			}
 			break;
-
+		default:
+			break;
 		} // switch ( secCurr )
 	} // while ( true )
 

@@ -15,7 +15,7 @@
 
 
 
-#pragma warning( disable : 4786 )
+
 
 #include <fstream>
 #include <list>

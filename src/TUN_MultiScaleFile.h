@@ -15,7 +15,7 @@
 
 
 
-#pragma warning( disable : 4786 )
+
 
 #include "TUN_Scale.h"
 
@@ -156,4 +156,3 @@ public:
 
 
 #endif // !defined(AFX_MULTISCALEFILE_H__15693DC4_FB37_11D6_A827_F4C607C10000__INCLUDED_)
-

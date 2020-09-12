@@ -71,7 +71,7 @@ public:
 		else
 		{
 			//              012345
-			char	sz[16] = "Line 1234567890"; // Enough for 32-Bit
+			// Unused: char	sz[16] = "Line 1234567890"; // Enough for 32-Bit
 			if ( lLineNr >= 0 )
 				// CHANGED:  Removed ltoa usage
 				// Original usage:  ... ltoa(lLineNr, &sz[5], 10) ...
