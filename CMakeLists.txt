@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 14)
 # Don't use e.g. GNU extension (like -std=gnu++11) for portability
 set(CMAKE_CXX_EXTENSIONS false)
 
+# Have all compiler warnings be considered an error
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Werror")
+
 project(Anamark-Tuning-Library VERSION 0.9.0.0 LANGUAGES CXX)
 message( STATUS "Compiler Version is ${CMAKE_CXX_COMPILER_VERSION}" )
 
