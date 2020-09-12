@@ -34,7 +34,7 @@ endif()
 # Have all compiler warnings be considered an error
 if (WIN32)
   # Windows version
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /Wall /WX")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4 /WX")
 else()
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Werror")
 endif()
