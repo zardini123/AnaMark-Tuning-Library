@@ -12,7 +12,7 @@ if (WIN32)
   # https://docs.microsoft.com/en-us/cpp/build/reference/compiler-option-warning-level?view=vs-2019
   set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W4 /WX")
 else()
-  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Werror")
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra")
 endif()
 
 project(Anamark-Tuning-Library VERSION 0.9.0.0 LANGUAGES CXX)

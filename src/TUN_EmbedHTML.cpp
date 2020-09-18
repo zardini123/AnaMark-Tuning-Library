@@ -283,7 +283,7 @@ std::string HTMLEntities(const std::string & str)
 	std::string	strResult;
 	strResult.reserve(str.size());
 
-	for ( long l = 0 ; l < str.size() ; ++l )
+	for ( std::size_t l = 0 ; l < str.size() ; ++l )
 		switch ( str.at(l) )
 		{
 		case '\0':	strResult += "<br />"; strResult += '\0'; break;

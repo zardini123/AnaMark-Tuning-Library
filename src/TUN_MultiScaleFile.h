@@ -76,7 +76,7 @@ public:
 			os << ";======================================================================" << std::endl;
 			os << ";======================================================================" << std::endl;
 			os << std::endl;
-			if ( !it->Write(os, lVersionFrom, lVersionTo, false) )
+			if ( !it->Write(os, lVersionFrom, lVersionTo/*, false*/) )
 				return m_err.SetError(it->Err().GetLastError().c_str());
 		}
 		return m_err.SetOK();

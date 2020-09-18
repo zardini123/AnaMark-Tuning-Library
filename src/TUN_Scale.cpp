@@ -332,17 +332,17 @@ long CSingleScale::MapMIDI2Scale(long lMIDINoteNumber) const
 
 bool CSingleScale::Write(const char * szFilepath,
 						 long lVersionFrom /* = 0 */,
-						 long lVersionTo /* = 200 */,
-						 bool bWriteHeaderComment /* = true */)
+						 long lVersionTo /* = 200 */ /*,
+						 bool bWriteHeaderComment = true */)
 {
 	std::ofstream	ofs(szFilepath, std::ios_base::out | std::ios_base::trunc);
-	return Write(ofs, lVersionFrom, lVersionTo, bWriteHeaderComment);
+	return Write(ofs, lVersionFrom, lVersionTo/*, bWriteHeaderComment*/);
 }
 
 bool CSingleScale::Write(std::ostream & os,
 						 long lVersionFrom /* = 0 */,
-						 long lVersionTo /* = 200 */,
-						 bool bWriteHeaderComment /* = true */)
+						 long lVersionTo /* = 200 */ /*,
+						 bool bWriteHeaderComment = true */)
 {
 	// Evaluate which sections to write
 	if ( lVersionFrom < 0 )
@@ -892,7 +892,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 						// Check format:
 						// Musician or Band|Album|Title|Year|Misc
 						long	lNumOfBars = 0;
-						for ( long l = 0 ; l < strNewComposition.size() ; ++l )
+						for ( std::size_t l = 0 ; l < strNewComposition.size() ; ++l )
 							if ( strNewComposition.at(l) == '|' )
 								++lNumOfBars;
 						if ( lNumOfBars != 4 )
@@ -1246,7 +1246,7 @@ bool CSingleScale::AppliesToChannel(long lMIDIChannel) const
 CSingleScale::eSection CSingleScale::FindSection(const std::string & strSection)
 {
 	if ( !strSection.empty() )
-		for ( long l = 0 ; l < m_vstrSections.size() ; ++l )
+		for ( std::size_t l = 0 ; l < m_vstrSections.size() ; ++l )
 			if ( strSection == strx::GetAsLower(m_vstrSections.at(l)) )
 				return static_cast<CSingleScale::eSection>(l);
 	return SEC_Unknown;
@@ -1258,7 +1258,7 @@ CSingleScale::eKey CSingleScale::FindKey(const std::string & strKey, long & lKey
 {
 	if ( !strKey.empty() )
 	{
-		for ( long l = 0 ; l < m_vstrKeys.size() ; ++l )
+		for ( std::size_t l = 0 ; l < m_vstrKeys.size() ; ++l )
 		{
 			std::string	strCurr = strx::GetAsLower(m_vstrKeys.at(l));
 			if ( strKey == strCurr )
