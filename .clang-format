@@ -63,9 +63,10 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
 PointerAlignment: Left
-ReflowComments: false
 SortIncludes: true
 SortUsingDeclarations: false
+
+ReflowComments: false
 SpaceAfterCStyleCast: false
 SpaceAfterTemplateKeyword: false
 SpaceBeforeAssignmentOperators: true
@@ -80,5 +81,6 @@ SpacesInAngles: true
 SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: true
+
 TabWidth: 8
 UseTab: Never

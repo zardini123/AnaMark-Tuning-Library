@@ -53,8 +53,8 @@ struct SRVParam
 		t_RelRef	// Parameter given as relative reference
 	}			m_paramtype;
 
-	long		m_lRef;		// Reference (absolute or relative, depends on m_paramtype)
-	double		m_dblValue;	// Value (m_paramtype == t_Value)
+	long		m_lRef = 0;		// Reference (absolute or relative, depends on m_paramtype)
+	double		m_dblValue = 0;	// Value (m_paramtype == t_Value)
 
 
 	// Retrieve the resolved value (= references are resolved)

@@ -1,4 +1,4 @@
-character_after_doublecharacter_after_double// TUN_StringTools.h: Implementation of string tool functions
+// TUN_StringTools.h: Implementation of string tool functions
 //
 // (C)opyright in 2009 by Mark Henning, Germany
 //
@@ -30,12 +30,12 @@ namespace strx
 
 /**
  * Replacement for Windows function __iscsymf.
- * @param  c The character as a signed integer.
+ * @param  c The character.
  * @return   Non-zero value if c is a letter or an underscore, 0 if c is not a letter or an underscore.
  */
 int IsLetterOrUnderscore(int c)
 {
-	return isalpha(c) || c == '_';
+	return std::isalpha(static_cast<char>(c), std::locale("C")) || c == '_';
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -63,29 +63,43 @@ const char * WhiteSpaceChars()
 /**
  * Convert all characters to lower case using C++ function [tolower](http://www.cplusplus.com/reference/cctype/tolower/).
  *
- * @param  str [description]
- * @return     [description]
+ * Uses "C" locale regardless of global locale.
+ *
+ * Conversion is done in-place.  Input string reference will be modified!
+ * Make a copy of string first if you dont want to modify your source string.
+ *
+ * @param  str Reference to string that will be converted.
+ * @return     Reference of the modified input string.
  */
 std::string & ToLower(std::string & str)
 {
 	for ( std::string::size_type l = 0 ; l < str.size() ; ++l )
-		str.at(l) = static_cast<char>( tolower(str.at(l)) );
+		str.at(l) = static_cast<char>( tolower(str.at(l), std::locale("C")) );
 	return str;
 }
 
+/**
+ * Apply ToLower function on string.  Return a copy, instead of a reference to the modified input.
+ * @param  str Reference to string that will be converted to lowercase.
+ * @return     Lowercase version of str, returned as a copy.
+ */
 std::string	GetAsLower(const std::string & str)
 {
-	// CHANGED: String function output is placed into a temp std::string as
-	// 		the following function needs a variable to pass by reference,
-	// 		but the string function (construction) is not a referencable value.
-	// This must be done a couple times throughout StringTools.cpp.  See all
-	// 		variables titled "temp"
-	std::string temp = std::string(str);
-	return ToLower(temp);
+	std::string copy = std::string(str);
+	return ToLower(copy);
 }
 
-
-
+/**
+ * Removes trailing and leading whitespace.
+ *
+ * The whitespace considered is the whitespace in character array returned by WhiteSpaceChars().
+ *
+ * Conversion is done in-place.  Input string reference will be modified!
+ * Make a copy of string first if you dont want to modify your source string.
+ *
+ * @param  str Reference of string to trim.
+ * @return     Reference of the modified input string.
+ */
 std::string & Trim(std::string & str)
 {
 	std::string::size_type	posFirst = str.find_first_not_of(WhiteSpaceChars());
@@ -96,23 +110,31 @@ std::string & Trim(std::string & str)
 	return str;
 }
 
-
-
+/**
+ * Remove all spaces in str.
+ *
+ * Space characters are from that of the "C" locale.
+ *
+ * Conversion is done in-place.  Input string reference will be modified!
+ * Make a copy of string first if you dont want to modify your source string.
+ * @param  str [description]
+ * @return     [description]
+ */
 std::string & RemoveSpaces(std::string & str)
 {
 	// We're doing in-place conversion here:
-	std::string::size_type	posR = 0;
-	std::string::size_type	posW = 0;
+	std::string::size_type	read_position = 0;
+	std::string::size_type	write_position = 0;
 
-	while ( posR < str.size() )
+	while ( read_position < str.size() )
 	{
-		char	ch = str.at(posR++);
-		if ( !isspace(ch) )
-			str.at(posW++) = ch;
-	} // while ( posR < size() )
+		char	ch = str.at(read_position++);
+		if ( !isspace(ch, std::locale("C")) )
+			str.at(write_position++) = ch;
+	} // while ( read_position < size() )
 
 	// Remove the remaining chars of the original string
-	str.erase(posW);
+	str.erase(write_position);
 
 	return str;
 }
@@ -284,15 +306,25 @@ bool EvalKeyAndValue(std::string & input_string, std::string & key, std::string 
 
 	// Split key and value around the '=' character
 	std::string keyTemp = input_string.substr(0, pos);
-	key = ToLower(Trim(temp));
+	key = ToLower(Trim(keyTemp));
 
 	std::string valueTemp = input_string.substr(pos+1);
-	value = Trim(temp);
+	value = Trim(valueTemp);
 	return true;
 }
 
 
-
+/**
+ * Get the section name from str.
+ *
+ * Removes encompassing "[]" characters, and converts str to lowercase.
+ *
+ * Modification happens in-place (str is modiifed).
+ *
+ * @param  str Section name string.  Of form "[Section Name]".
+ * @return     Returns false if the first character is not '[', the last character is not ']', or the string length is less than 2.
+ * 						 Returns true otherwise.
+ */
 bool EvalSection(std::string & str)
 {
 	if ( (str.size() < 2) || (str.at(0) != '[') || (str.at(str.size()-1) != ']') )
@@ -304,7 +336,17 @@ bool EvalSection(std::string & str)
 }
 
 
-
+/**
+ * Get the function parameters from str.
+ *
+ * Removes encompassing "()" characters.
+ *
+ * Modification happens in-place (str is modiifed).
+ *
+ * @param  str Function parameters string.  Of form "(function parameters)".
+ * @return     Returns false if the first character is not '(', the last character is not ')', or the string length is less than 2.
+ * 						 Returns true otherwise.
+ */
 bool EvalFunctionParam(std::string & str)
 {
 	if ( (str.size() < 2) || (str.at(0) != '(') || (str.at(str.size()-1) != ')') )
@@ -314,7 +356,17 @@ bool EvalFunctionParam(std::string & str)
 }
 
 
-
+/**
+ * Get the string from str.
+ *
+ * Removes encompassing quote characters (i.e. \\").  Unescapes any characters preceeded with \\.
+ *
+ * Modification happens in-place (str is modiifed).
+ *
+ * @param  str Function parameters string.  Of form "(function parameters)".
+ * @return     Returns false if the first character is not '"', the last character is not '"', or the string length is less than 2.
+ * 						 Returns true otherwise.
+ */
 bool EvalString(std::string & str)
 {
 	if ( (str.size() < 2) || (str.at(0) != '\"') || (str.at(str.size()-1) != '\"') )
@@ -326,37 +378,44 @@ bool EvalString(std::string & str)
 }
 
 
-
-void Split(std::string & str, char chSeparator, std::list<std::string> & lstrResult,
-		   bool bTrimItems, bool bIgnoreEmptyItems)
+/**
+ * Split input_string into a list of strings at each seperator character in input_string.
+ * @param input_string                   String to split.  Not modified.
+ * @param separator                      Character to split input_string at.
+ * @param resulting_strings              Each seperate string as a list.  List passed will be cleared to add the substrings!
+ * @param trim_resulting_strings         Set to true to trim each split string.
+ * @param ignore_any_empty_split_strings Set to true to not add any substrings to resulting_strings if the substring is empty (i.e. no characters).
+ */
+void Split(std::string & input_string, char separator, std::list<std::string> & resulting_strings,
+		   bool trim_resulting_strings, bool ignore_any_empty_split_strings)
 {
 	// Initialize list
-	lstrResult.clear();
+	resulting_strings.clear();
 
 	// Split string
-	std::string::size_type	posCurr = 0;
-	std::string::size_type	posSep = 0;
+	std::string::size_type	current_find_start_index = 0;
+	std::string::size_type	first_seperator_found_position = 0;
 
 	while ( true )
 	{
-		if ( posSep == std::string::npos )
+		if ( first_seperator_found_position == std::string::npos )
 			return;
 
 		// Find the next separator and extract the item
-		posSep = str.find(chSeparator, posCurr);
-		std::string	strCurr;
-		if ( posSep == std::string::npos )
-			strCurr = str.substr(posCurr);
+		first_seperator_found_position = input_string.find(separator, current_find_start_index);
+		std::string	current_substring;
+		if ( first_seperator_found_position == std::string::npos )
+			current_substring = input_string.substr(current_find_start_index);
 		else
-			strCurr = str.substr(posCurr, posSep - posCurr);
-		posCurr = posSep + 1;
+			current_substring = input_string.substr(current_find_start_index, first_seperator_found_position - current_find_start_index);
+		current_find_start_index = first_seperator_found_position + 1;
 
 		// Process the item
-		if ( bTrimItems )
-			Trim(strCurr);
-		if ( bIgnoreEmptyItems && strCurr.empty() )
+		if ( trim_resulting_strings )
+			Trim(current_substring);
+		if ( ignore_any_empty_split_strings && current_substring.empty() )
 			continue;
-		lstrResult.push_back(strCurr);
+		resulting_strings.push_back(current_substring);
 	}
 }
 
@@ -372,34 +431,69 @@ void Split(std::string & str, char chSeparator, std::list<std::string> & lstrRes
 
 
 
-// Convert double- and long-values to string
-std::string ltostr(long lValue)
+/**
+ * Convert long to string.
+ *
+ * @param  value Long to convert.
+ * @return       String of the long.
+ */
+std::string ltostr(long value)
 {
 	// CHANGED:  Removed ltoa usage
 	// Original usage:
 	// char	sz[11]; // Enough for 32-Bit long
-	// 	...ltoa(lValue, sz, 10)...
-	return std::to_string(lValue);
+	// 	...ltoa(value, sz, 10)...
+
+	// FIXME:  Locale dependence!
+	return std::to_string(value);
 }
 
-std::string dtostr(double dblValue)
+/**
+ * Converts double to string.
+ *
+ * @param  value Double to convert.
+ * @return       String of the double.
+ */
+std::string dtostr(double value)
 {
-	char	sz[30]; // Enough for 64-Bit double
+	// Original call was _gcvt, where _gcvt was Windows only
 
-	// TODO:  Replace function call gcvt and test, as gcvt is not standard
-	// 		Original call was _gcvt, where _gcvt was Windows only
-	//    May not be avaliable in all compilers, nor operate the same
-	// 		gcvt is avaliable in gcc v9.2.0 Homebrew
-	return std::string(gcvt(dblValue, 20, sz));
+	char *value_as_string = nullptr;
+
+	// FIXME: Snprintf locale dependent!!
+
+	// Get the required length of the string
+	int required_size = snprintf(value_as_string, 0, "%.20g", value);
+
+	value_as_string = (char *)malloc( required_size * sizeof( char ) );
+	snprintf(value_as_string, required_size, "%.20g", value);
+
+	std::string final(value_as_string);
+
+	free(value_as_string);
+
+	return final;
 }
 
+/**
+ * Encompasses str with "[]".
+ *
+ * Part of the TUN specification of having sections being declared with encompassing brackets.
+ *
+ * @param  str String to add brackets around.  Str is not modified.
+ * @return     Returns copy of str with brackets added at beginning and end.
+ */
 std::string	GetAsSection(const std::string & str)
 {
 	return "[" + str + "]";
 }
 
-
-
+/**
+ * Encompasses str with quotes, and converts all characters that must be escaped when programming (as defined in function Escape()) is prefaced with a \\.
+ *
+ * @param  str String to get as "string."  Str is not modified.
+ * @return     Returns copy of str with quotes added to beginning and end, with special characters escaped.
+ */
 std::string	GetAsString(const std::string & str)
 {
 	std::string temp = std::string(str);
