@@ -1,4 +1,4 @@
-// TUN_StringTools.h: Implementation of string tool functions
+character_after_doublecharacter_after_double// TUN_StringTools.h: Implementation of string tool functions
 //
 // (C)opyright in 2009 by Mark Henning, Germany
 //
@@ -28,15 +28,11 @@ namespace strx
 // Character tool functions
 //////////////////////////////////////////////////////////////////////
 
-// Replaces __iscsymf
-// From Microsoft docs:
-// 		int __iscsymf(
-//    		int c
-// 		);
-//
-// 		Both __iscsymf and __iswcsymf return a nonzero value if c is a
-// 		letter or an underscore.
-// 		Each of these routines returns 0 if c does not satisfy the test condition.
+/**
+ * Replacement for Windows function __iscsymf.
+ * @param  c The character as a signed integer.
+ * @return   Non-zero value if c is a letter or an underscore, 0 if c is not a letter or an underscore.
+ */
 int IsLetterOrUnderscore(int c)
 {
 	return isalpha(c) || c == '_';
@@ -46,11 +42,30 @@ int IsLetterOrUnderscore(int c)
 // String tool functions
 //////////////////////////////////////////////////////////////////////
 
+/**
+ * Returns a string literal of the following whitespace characters in this order:
+ * - Horizontal tab (0x09, '\t')
+ * - Line feed (0x0a, '\n')
+ * - Vertical tab (0x0b, '\v')
+ * - Form feed (0x0c, '\f')
+ * - Carriage return (0x0d, '\r')
+ * - Space (0x20, ' ')
+ *
+ * Returned string is the same regardless of locale.
+ *
+ * @return String literal of the popular whitespace characters.
+ */
 const char * WhiteSpaceChars()
 {
 	return "\x09\x0a\x0b\x0c\x0d\x20";
 }
 
+/**
+ * Convert all characters to lower case using C++ function [tolower](http://www.cplusplus.com/reference/cctype/tolower/).
+ *
+ * @param  str [description]
+ * @return     [description]
+ */
 std::string & ToLower(std::string & str)
 {
 	for ( std::string::size_type l = 0 ; l < str.size() ; ++l )
@@ -199,44 +214,80 @@ std::string & Unescape(std::string & str)
 //////////////////////////////////////////////////////////////////////
 
 
-
-
-
-bool Eval(const std::string & str, std::string::size_type & pos, double & dblResult)
+/**
+ * Evaluate string as a double.  Evaluation starts at input_string index pos.
+ * @param  input_string Referenced string to evaluate.
+ * 											String is not modified.
+ * @param  pos          Index in input_string to start evaluating.
+ * 											Passed variable modified to be first character after the double (if function returns true).
+ * @param  result       Double that was evaluated (if function returns true).
+ * @return              False if string at pos was unable to be evaluated as a double.
+ */
+bool Eval(const std::string & input_string, std::string::size_type & pos, double & result)
 {
-	const char	* szBeginPtr = str.c_str() + pos;
-	char		* szEndPtr;
-	dblResult = strtod(szBeginPtr, &szEndPtr); // conversion
-	pos += szEndPtr - szBeginPtr; // points to the next char
-	return (szBeginPtr != szEndPtr); // return false if an error occurred
+	const char	* beginning_ptr = input_string.c_str() + pos;
+	char		* character_after_double_ptr;
+
+	// Convert string to double at beginning_ptr, and sets character_after_double_ptr to the first character after the double
+	// FIXME: Locale dependence!!
+	result = strtod(beginning_ptr, &character_after_double_ptr); // conversion
+	// Add distance of beginning to end of double (in bytes a.k.a chars) to pos
+	// Will provide users with position of first character after the double
+	pos += character_after_double_ptr - beginning_ptr;
+
+	// Return false if an error occurred when converting double
+	return (beginning_ptr != character_after_double_ptr);
 }
 
 
-
-bool Eval(const std::string & str, std::string::size_type & pos, long & lResult)
+/**
+ * Evaluate string as a long.  Evaluation starts at input_string index pos.
+ * @param  input_string Referenced string to evaluate.
+ * 											String is not modified.
+ * @param  pos          Index in input_string to start evaluating.
+ * 											Passed variable modified to be first character after the long (if function returns true).
+ * @param  result       Long that was evaluated (if function returns true).
+ * @return              False if string starting at pos was unable to be evaluated as a long.
+ */
+bool Eval(const std::string & input_string, std::string::size_type & pos, long & result)
 {
-	const char	* szBeginPtr = str.c_str() + pos;
-	char		* szEndPtr;
-	lResult = strtol(szBeginPtr, &szEndPtr, 10); // conversion
-	pos += szEndPtr - szBeginPtr; // points to the next char
-	return (szBeginPtr != szEndPtr); // return false if an error occurred
+	const char	* beginning_ptr = input_string.c_str() + pos;
+	char		* character_after_long_ptr;
+
+	// Convert string to long at beginning_ptr, and sets character_after_long_ptr to the first character after the long
+	// FIXME: Locale dependence!!
+	result = strtol(beginning_ptr, &character_after_long_ptr, 10); // conversion
+	// Add distance of beginning to end of double (in bytes a.k.a chars) to pos
+	// Will provide users with position of first character after the double
+	pos += character_after_long_ptr - beginning_ptr;
+
+	// Return false if an error occurred when converting long
+	return (beginning_ptr != character_after_long_ptr);
 }
 
 
-
-bool EvalKeyAndValue(std::string & str, std::string & strKey, std::string & strValue)
+/**
+ * Split a input string to key and value parts via the character '='.
+ * @param  input_string String to extract key and value strings from.
+ * @param  key          Used as output.  String will be the key part of input_string.
+ * @param  value       	Used as output.  String will be the value part of input_string.
+ * @return              Returns false if no '=' character in input_string, or the first character of input_string is not a letter or underscore.
+ * 											Returns true otherwise.
+ */
+bool EvalKeyAndValue(std::string & input_string, std::string & key, std::string & value)
 {
-	std::string::size_type	pos = str.find('=');
+	std::string::size_type	pos = input_string.find('=');
 
 	// CHANGED: IsLetterOrUnderscore replaced __iscsymf
-	if ( (pos == std::string::npos) || (!IsLetterOrUnderscore(str.at(0))) )
+	if ( (pos == std::string::npos) || (!IsLetterOrUnderscore(input_string.at(0))) )
 		return false; // error: no '=' or first char of key is invalid
 
-	std::string temp = str.substr(0, pos);
-	strKey = ToLower(Trim(temp));
+	// Split key and value around the '=' character
+	std::string keyTemp = input_string.substr(0, pos);
+	key = ToLower(Trim(temp));
 
-	temp = str.substr(pos+1);
-	strValue = Trim(temp);
+	std::string valueTemp = input_string.substr(pos+1);
+	value = Trim(temp);
 	return true;
 }
 
