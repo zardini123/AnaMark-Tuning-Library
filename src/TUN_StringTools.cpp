@@ -44,11 +44,11 @@ int IsLetterOrUnderscore(int c)
 
 /**
  * Returns a string literal of the following whitespace characters in this order:
- * - Horizontal tab (0x09, '\t')
- * - Line feed (0x0a, '\n')
- * - Vertical tab (0x0b, '\v')
- * - Form feed (0x0c, '\f')
- * - Carriage return (0x0d, '\r')
+ * - Horizontal tab (0x09, '\\t')
+ * - Line feed (0x0a, '\\n')
+ * - Vertical tab (0x0b, '\\v')
+ * - Form feed (0x0c, '\\f')
+ * - Carriage return (0x0d, '\\r')
  * - Space (0x20, ' ')
  *
  * Returned string is the same regardless of locale.
@@ -359,7 +359,7 @@ bool EvalFunctionParam(std::string & str)
 /**
  * Get the string from str.
  *
- * Removes encompassing quote characters (i.e. \\").  Unescapes any characters preceeded with \\.
+ * Removes encompassing quote characters (i.e. \\").  Unescapes any characters preceeded with \\
  *
  * Modification happens in-place (str is modiifed).
  *

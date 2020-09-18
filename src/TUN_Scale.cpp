@@ -332,17 +332,17 @@ long CSingleScale::MapMIDI2Scale(long lMIDINoteNumber) const
 
 bool CSingleScale::Write(const char * szFilepath,
 						 long lVersionFrom /* = 0 */,
-						 long lVersionTo /* = 200 */ /*,
-						 bool bWriteHeaderComment = true */)
+						 long lVersionTo /* = 200 */,
+						 bool bWriteHeaderComment /* = true */)
 {
 	std::ofstream	ofs(szFilepath, std::ios_base::out | std::ios_base::trunc);
-	return Write(ofs, lVersionFrom, lVersionTo/*, bWriteHeaderComment*/);
+	return Write(ofs, lVersionFrom, lVersionTo, bWriteHeaderComment);
 }
 
 bool CSingleScale::Write(std::ostream & os,
 						 long lVersionFrom /* = 0 */,
-						 long lVersionTo /* = 200 */ /*,
-						 bool bWriteHeaderComment = true */)
+						 long lVersionTo /* = 200 */,
+						 bool bWriteHeaderComment /*= true*/)
 {
 	// Evaluate which sections to write
 	if ( lVersionFrom < 0 )
@@ -359,7 +359,7 @@ bool CSingleScale::Write(std::ostream & os,
 	int				i;
 
 	// Header comment
-	if ( bV100 || bV200 )
+	if ( (bV100 || bV200) && bWriteHeaderComment )
 	{
 		os << ";" << std::endl;
 		os << "; This is an AnaMark tuning map file V2.00" << std::endl;

@@ -210,9 +210,9 @@ public:
 	// lVersionFrom and lVersionTo define which sections to write.
 	// Valid version values for From and To are 0, 100, 200
 	bool	Write(const char * szFilepath,
-				  long lVersionFrom = 0, long lVersionTo = 200/*, bool bWriteHeaderComment = true*/);
+				  long lVersionFrom = 0, long lVersionTo = 200, bool bWriteHeaderComment = true);
 	bool	Write(std::ostream & os,
-				  long lVersionFrom = 0, long lVersionTo = 200/*, bool bWriteHeaderComment = true*/);
+				  long lVersionFrom = 0, long lVersionTo = 200, bool bWriteHeaderComment = true);
 private:
 	void	WriteSection(std::ostream & os, eSection section) const;
 	void	WriteKey(std::ostream & os, eKey key, const std::list<std::string> & lstrValues) const;
