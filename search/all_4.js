@@ -5,9 +5,9 @@ var searchData=
   ['ervparamtype',['eRVParamType',['../struct_t_u_n_1_1_s_r_v_param.html#aa2ecb9da1e8f1b9eca397766c70f74a8',1,'TUN::SRVParam']]],
   ['escape',['Escape',['../namespace_t_u_n_1_1strx.html#aaf0335995baeb254f5ec14086f2473ee',1,'TUN::strx']]],
   ['esection',['eSection',['../class_t_u_n_1_1_c_single_scale.html#a5bdbccdda07fa820774949d842720a02',1,'TUN::CSingleScale']]],
-  ['eval',['Eval',['../namespace_t_u_n_1_1strx.html#afd6c5f16315b787c552d2d8f173e043d',1,'TUN::strx::Eval(const std::string &amp;str, std::string::size_type &amp;pos, double &amp;dblResult)'],['../namespace_t_u_n_1_1strx.html#a051630a7629aad69cb2fb476884c3ae8',1,'TUN::strx::Eval(const std::string &amp;str, std::string::size_type &amp;pos, long &amp;lResult)']]],
+  ['eval',['Eval',['../namespace_t_u_n_1_1strx.html#a3b03577e433643949c333d846462e9a6',1,'TUN::strx::Eval(const std::string &amp;input_string, std::string::size_type &amp;pos, double &amp;result)'],['../namespace_t_u_n_1_1strx.html#af4ed267128eb66211b0f218734dccb30',1,'TUN::strx::Eval(const std::string &amp;input_string, std::string::size_type &amp;pos, long &amp;result)']]],
   ['evalfunctionparam',['EvalFunctionParam',['../namespace_t_u_n_1_1strx.html#a88b7da268637f50b6dd4052a3b3e337a',1,'TUN::strx']]],
-  ['evalkeyandvalue',['EvalKeyAndValue',['../namespace_t_u_n_1_1strx.html#afb3f02e3fbf5f8217a8e40a93f158ebf',1,'TUN::strx']]],
+  ['evalkeyandvalue',['EvalKeyAndValue',['../namespace_t_u_n_1_1strx.html#a460a4870417f12e53473511b78757ec3',1,'TUN::strx']]],
   ['evalsection',['EvalSection',['../namespace_t_u_n_1_1strx.html#a47dee196e88403d5f3288cabac55b93a',1,'TUN::strx']]],
   ['evalstring',['EvalString',['../namespace_t_u_n_1_1strx.html#a34f456999bc35e14728b978b6704b697',1,'TUN::strx']]]
 ];

@@ -12,7 +12,7 @@ var searchData=
   ['settocentswithfreq',['SetToCentsWithFreq',['../class_t_u_n_1_1_c_formula.html#a3d11f88c632c278c9bd679abe9ba923b',1,'TUN::CFormula']]],
   ['settoensurehz',['SetToEnsureHz',['../class_t_u_n_1_1_c_formula.html#a733faab946a6d486a1ffbe68064dc6eb',1,'TUN::CFormula']]],
   ['settohz',['SetToHz',['../class_t_u_n_1_1_c_formula.html#aa8c5c9a513a8a0871df1c5b610a3692c',1,'TUN::CFormula']]],
-  ['split',['Split',['../namespace_t_u_n_1_1strx.html#a50e16762fe143651ad8e4e899a209c19',1,'TUN::strx']]],
+  ['split',['Split',['../namespace_t_u_n_1_1strx.html#a4db2f3ba64c3689720c67f40117dc4b4',1,'TUN::strx']]],
   ['srvparam',['SRVParam',['../struct_t_u_n_1_1_s_r_v_param.html#a38b8c5cdaa7409a1d1fa925a552b8181',1,'TUN::SRVParam']]],
   ['str',['str',['../class_t_u_n_1_1_c_string_parser.html#af1765061eff914e7b88fe7c4c7a17f33',1,'TUN::CStringParser::str()'],['../class_t_u_n_1_1_c_string_parser.html#a089390d905526bcfe481aad7dcb0563a',1,'TUN::CStringParser::str() const ']]],
   ['stringlist2string',['StringList2String',['../namespace_t_u_n.html#ac0bda52f660f4cf8c53dd985eb4d25d0',1,'TUN']]]
