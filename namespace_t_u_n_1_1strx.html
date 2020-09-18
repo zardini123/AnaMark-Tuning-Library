@@ -132,8 +132,6 @@ Functions</h2></td></tr>
 <tr class="separator:ae4c08ecb4585a251622bbb8308ea1354"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a932cb6d07f77da2bd838005b05f1ad2c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_t_u_n_1_1strx.html#a932cb6d07f77da2bd838005b05f1ad2c">GetAsString</a> (const std::string &amp;str)</td></tr>
 <tr class="separator:a932cb6d07f77da2bd838005b05f1ad2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af378f8bb1e5ab55948432edf7ffe394f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_t_u_n_1_1strx.html#af378f8bb1e5ab55948432edf7ffe394f">IsLetterOrUnderscore</a> ()</td></tr>
-<tr class="separator:af378f8bb1e5ab55948432edf7ffe394f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a15461d18eb729ff872510de7cfe04ce9"></a>
@@ -365,7 +363,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Get the string from str.</p>
-<p>Removes encompassing quote characters (i.e. \"). Unescapes any characters preceeded with \.</p>
+<p>Removes encompassing quote characters (i.e. \"). Unescapes any characters preceeded with \</p>
 <p>Modification happens in-place (str is modiifed).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -469,21 +467,6 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Non-zero value if c is a letter or an underscore, 0 if c is not a letter or an underscore. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="af378f8bb1e5ab55948432edf7ffe394f"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int TUN::strx::IsLetterOrUnderscore </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -671,12 +654,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Returns a string literal of the following whitespace characters in this order:</p><ul>
-<li>Horizontal tab (0x09, '')</li>
-<li>Line feed (0x0a, '<br />
-')</li>
-<li>Vertical tab (0x0b, '')</li>
-<li>Form feed (0x0c, '')</li>
-<li>Carriage return (0x0d, '')</li>
+<li>Horizontal tab (0x09, '\t')</li>
+<li>Line feed (0x0a, '\n')</li>
+<li>Vertical tab (0x0b, '\v')</li>
+<li>Form feed (0x0c, '\f')</li>
+<li>Carriage return (0x0d, '\r')</li>
 <li>Space (0x20, ' ')</li>
 </ul>
 <p>Returned string is the same regardless of locale.</p>
