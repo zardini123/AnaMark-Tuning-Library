@@ -31,7 +31,8 @@ target_sources( anamark-tuning-library PRIVATE
   src/SCL_Import.cpp
   src/TUN_EmbedHTML.cpp
   src/TUN_Scale.cpp
-  src/TUN_StringTools.cpp )
+  src/TUN_StringTools.cpp
+  src/ScaleFormats/TUN.cpp )
 target_include_directories( anamark-tuning-library PRIVATE src )
 
 add_executable( anamark-tuning-test )

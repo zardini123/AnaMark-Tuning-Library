@@ -30,21 +30,11 @@ namespace TUN
 
 
 
-class CMultiScaleFile
+class CMultiScaleFile : public ProvidesErrorMessage
 {
 public:
 	CMultiScaleFile() {}
 	virtual ~CMultiScaleFile() {}
-
-
-
-	// Error handling
-	const CErr &	Err() const { return m_err; }
-private:
-	CErr	m_err;
-public:
-
-
 
 	// Write the list of scales to the file/stream
 	bool Write(const char * szFilepath, long lVersionFrom = 0, long lVersionTo = 200)
@@ -77,9 +67,9 @@ public:
 			os << ";======================================================================" << std::endl;
 			os << std::endl;
 			if ( !it->Write(os, lVersionFrom, lVersionTo, false) )
-				return m_err.SetError(it->Err().GetLastError().c_str());
+				return err.SetError(it->GetError().GetMessage().c_str());
 		}
-		return m_err.SetOK();
+		return err.SetOK();
 	}
 
 
@@ -93,11 +83,10 @@ public:
 		std::ifstream	ifstr(szFilepath, std::ios_base::in | std::ios_base::binary);
 
 		if ( !ifstr )
-			return m_err.SetError("Error opening the file.");
+			return err.SetError("Error opening the file.");
 
 		// String which will receive the current line from the file
 		CStringParser	strparser;
-		strparser.InitStreamReading();
 
 		// Read the file
 		long	lResult = Add(ifstr, strparser);

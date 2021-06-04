@@ -346,7 +346,7 @@ bool CEmbedHTML::WriteFile(std::string strScaleFile, std::string strEmbeddedFile
 	CSingleScale	ss;
 	if ( !ss.Read(strScaleFile.c_str()) )
 	{
-		m_err = ss.Err();
+		err = ss.GetError();
 		return false;
 	}
 
@@ -367,10 +367,10 @@ bool CEmbedHTML::WriteFile(CSingleScale & ssScale, std::string strEmbeddedFile,
 	std::ofstream	ofs(strEmbeddedFile.c_str(), std::ios_base::out | std::ios_base::trunc);
 	ofs << strEmbeddedData;
 	if ( !ofs )
-		return m_err.SetError("Error writing the file.");
+		return err.SetError("Error writing the file.");
 	ofs.close();
 
-	return m_err.SetOK();
+	return err.SetOK();
 }
 
 

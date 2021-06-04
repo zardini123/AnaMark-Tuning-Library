@@ -1,0 +1,43 @@
+# Based off of https://github.com/taocpp/PEGTL/blob/master/.clang-tidy
+
+# Dash (-) prefacing a check disables that individual check
+Checks: >-
+  bugprone-*,
+  cppcoreguidelines-slicing,
+  cppcoreguidelines-special-member-functions,
+  google-build-explicit-make-pair,
+  google-build-namespaces,
+  google-default-arguments,
+  google-global-names-in-headers,
+  google-readability-casting,
+  google-readability-function-size,
+  llvm-*,
+  -llvm-namespace-comment,
+  misc-*,
+  -misc-no-recursion,
+  -misc-non-private-member-variables-in-classes,
+  -misc-unused-alias-decls,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  -modernize-concat-nested-namespaces,
+  -modernize-raw-string-literal,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+  -readability-avoid-const-params-in-decls,
+  -readability-magic-numbers,
+  -readability-static-accessed-through-instance,
+
+CheckOptions:
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase # PEGTL had this as lower_case
+  - key: readability-identifier-naming.FunctionCase
+    value: CamelCase
+  - key: readability-identifier-naming.ParameterCase
+    value: camelBack
+  - key: readability-identifier-naming.StructCase
+    value: aNy_CasE # PEGTL rules
+  - key: readability-identifier-naming.VariableCase
+    value: camelBack
+
+# WarningsAsErrors: "*"

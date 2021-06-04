@@ -1,4 +1,4 @@
-// SCL_Import.h: Schnittstelle für die Klasse CSCL_Import.
+// SCL_Import.h: Schnittstelle fï¿½r die Klasse CSCL_Import.
 //
 // (C)opyright in 2009 by Mark Henning, Germany
 //
@@ -21,7 +21,7 @@
 namespace TUN
 {
 
-class CSCL_Import  
+class CSCL_Import : public ProvidesErrorMessage
 {
 public:
 	CSCL_Import();
@@ -29,12 +29,6 @@ public:
 
 	void	ResetTuning();
 	void	ResetMapping();
-
-	// Error handling
-	const CErr &	Err() const { return m_err; }
-private:
-	CErr	m_err;
-public:
 
 	// Handling of Scala Keyboard Mapping files
 	bool			ReadKBM(const char * szFilepath);

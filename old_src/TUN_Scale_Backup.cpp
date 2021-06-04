@@ -66,8 +66,8 @@ namespace TUN
 
 
 
-const long		MaxNumOfNotes = 128;	// 0 - 127
-const double	DefaultBaseFreqHz = 8.1757989156437073336; // refers to A=440Hz
+const long		MaxNumOfNotes = 128;
+const double	DefaultBaseFreqHz = 8.1757989156437073336;
 
 
 
@@ -91,18 +91,21 @@ double Factor2Cents(double dblFactor)
 	return log(dblFactor) * (1200/log(2));
 }
 
-double MIDINote_DefaultHz(int nMIDINote)
+double DefaultMIDINoteToHz(int midiNote)
 {
-	return Cents2Hz(MIDINote_DefaultCents(nMIDINote), DefaultBaseFreqHz);
+	return Cents2Hz(DefaultMIDINoteToCents(midiNote), DefaultBaseFreqHz);
 }
 
-double MIDINote_DefaultCents(int nMIDINote)
+double DefaultMIDINoteToCents(int midiNote)
 {
-	if ( nMIDINote < 0 )
-		nMIDINote = 0;
-	if ( nMIDINote > 127 )
-		nMIDINote = 127;
-	return nMIDINote * 100;
+	// Clamp midiNote to 0 to 127 range
+	if ( midiNote < 0 ) {
+		midiNote = 0;
+	}
+	if ( midiNote > 127 ) {
+		midiNote = 127;
+	}
+	return midiNote * 100;
 }
 
 
@@ -190,9 +193,7 @@ CSingleScale::CSingleScale()
 
 
 
-CSingleScale::~CSingleScale()
-{
-}
+CSingleScale::~CSingleScale() = default;
 
 
 
@@ -208,7 +209,7 @@ CSingleScale::~CSingleScale()
 
 void CSingleScale::Reset()
 {
-	m_err.SetOK();
+	err.SetOK();
 
 	// Keys of section [Scale Begin]
 	m_strFormat = "";
@@ -350,7 +351,7 @@ bool CSingleScale::Write(std::ostream & os,
 	if ( lVersionTo > 200 )
 		lVersionTo = 200;
 	if ( lVersionFrom > lVersionTo )
-		return m_err.SetError("Error in version settings - file not written."); // Versions to write mismatch
+		return err.SetError("Error in version settings - file not written."); // Versions to write mismatch
 
 	bool	bV000 = ((lVersionFrom <= 0) && (lVersionTo >= 0));
 	bool	bV100 = ((lVersionFrom <= 100) && (lVersionTo >= 100));
@@ -554,7 +555,7 @@ bool CSingleScale::Write(std::ostream & os,
 		os << std::endl;
 	}
 
-	return m_err.SetOK();
+	return err.SetOK();
 }
 
 
@@ -638,11 +639,10 @@ long CSingleScale::Read(const char * szFilepath)
 	std::ifstream	ifstr(szFilepath, std::ios_base::in | std::ios_base::binary);
 
 	if ( !ifstr )
-		return m_err.SetError("Error opening the file.");
+		return err.SetError("Error opening the file.");
 
 	// String which will receive the current line from the file
 	CStringParser	strparser;
-	strparser.InitStreamReading();
 
 	// Read the file
 	long	lResult = Read(ifstr, strparser);
@@ -688,13 +688,13 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 			// No scale dataset found
 			if ( !bInScaleData )
 			{
-				m_err.SetError("No scale dataset found", m_lReadLineCount);
+				err.SetError("No scale dataset found", m_lReadLineCount);
 				return 0;
 			}
 			// Format version >= 200 requires [Scale End] at dataset end
 			if ( m_lFormatVersion >= 200 )
 			{
-				m_err.SetError("[Scale End] missing at file end or read error.", m_lReadLineCount);
+				err.SetError("[Scale End] missing at file end or read error.", m_lReadLineCount);
 				return -1;
 			}
 			// Format version < 200 ends with eof
@@ -740,7 +740,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 				bSectionOK |= (secCurr == SEC_Unknown); // Each version must be aware of unknown sections!
 				if ( !bSectionOK )
 				{
-					m_err.SetError("Section not version compliant.", m_lReadLineCount);
+					err.SetError("Section not version compliant.", m_lReadLineCount);
 					return -1;
 				}
 			} // if ( secCurr != SEC_ScaleBegin )
@@ -778,7 +778,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 		std::string	strKey, strValue;
 		if ( !strx::EvalKeyAndValue(strparser.str(), strKey, strValue) )
 		{
-			m_err.SetError("Syntax error", m_lReadLineCount);
+			err.SetError("Syntax error", m_lReadLineCount);
 			return -1;
 		}
 
@@ -796,7 +796,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 					return -1;
 				if ( m_strFormat != Format() )
 				{
-					m_err.SetError("Format not supported.", m_lReadLineCount);
+					err.SetError("Format not supported.", m_lReadLineCount);
 					return -1;
 				}
 				break;
@@ -845,7 +845,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 					return -1;
 				if ( !IsDateFormatOK(m_strDate) )
 				{
-					m_err.SetError("Date format mismatch. YYYY-MM-DD expected!", m_lReadLineCount);
+					err.SetError("Date format mismatch. YYYY-MM-DD expected!", m_lReadLineCount);
 					return -1;
 				}
 				break;
@@ -897,7 +897,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 								++lNumOfBars;
 						if ( lNumOfBars != 4 )
 						{
-							m_err.SetError("Composition format mismatch. \"Musician or Band|Album|Title|Year|Misc\" expected!", m_lReadLineCount);
+							err.SetError("Composition format mismatch. \"Musician or Band|Album|Title|Year|Misc\" expected!", m_lReadLineCount);
 							return -1;
 						}
 						m_lstrCompositions.push_back(strNewComposition);
@@ -947,7 +947,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 					std::string	strParams = strValue;
 					if ( !strx::EvalFunctionParam(strParams) )
 					{
-						m_err.SetError("Value type mismatch. Function parameter block expected!", m_lReadLineCount);
+						err.SetError("Value type mismatch. Function parameter block expected!", m_lReadLineCount);
 						return -1;
 					}
 
@@ -958,7 +958,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 						++szEndPtr;
 					if ( *szEndPtr != ',' )
 					{
-						m_err.SetError("Coma after parameter 1 missing!", m_lReadLineCount);
+						err.SetError("Coma after parameter 1 missing!", m_lReadLineCount);
 						return -1;
 					}
 					szBeginPtr = szEndPtr +1;
@@ -967,7 +967,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 						++szEndPtr;
 					if ( *szEndPtr != '\0' )
 					{
-						m_err.SetError("No more data expected after parameter 2!", m_lReadLineCount);
+						err.SetError("No more data expected after parameter 2!", m_lReadLineCount);
 						return -1;
 					}
 					InitEqual(m_lInitEqual_BaseNote, m_dblInitEqual_BaseFreqHz);
@@ -981,7 +981,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 					CFormula	formula(lKeyIndex);
 					if ( !formula.SetFromStr(strFormula) )
 					{
-						m_err.SetError("Formula syntax error or parameter refers to invalid note index!", m_lReadLineCount);
+						err.SetError("Formula syntax error or parameter refers to invalid note index!", m_lReadLineCount);
 						return -1;
 					}
 					AddFormula(formula);
@@ -1021,7 +1021,7 @@ long CSingleScale::Read(std::istream & istr, CStringParser & strparser)
 	switch ( secPriorityTuning )
 	{
 	case SEC_Unknown:
-		m_err.SetError("No tuning data found!", m_lReadLineCount);
+		err.SetError("No tuning data found!", m_lReadLineCount);
 		return -1;
 
 	case SEC_Tuning:
@@ -1083,9 +1083,9 @@ bool CSingleScale::CheckType(const std::string & strValue, std::string & strResu
 {
 	strResult = strValue;
 	if ( !strx::EvalString(strResult) )
-		return m_err.SetError("Value type mismatch. String expected!", m_lReadLineCount);
+		return err.SetError("Value type mismatch. String expected!", m_lReadLineCount);
 	else
-		return m_err.SetOK();
+		return err.SetOK();
 }
 
 
@@ -1094,9 +1094,9 @@ bool CSingleScale::CheckType(const std::string & strValue, double & dblResult)
 {
 	std::string::size_type	pos = 0;
 	if ( strx::Eval(strValue, pos, dblResult) && (pos == strValue.size()) )
-		return m_err.SetOK();
+		return err.SetOK();
 	else
-		return m_err.SetError("Value type mismatch. Float expected!", m_lReadLineCount);
+		return err.SetError("Value type mismatch. Float expected!", m_lReadLineCount);
 }
 
 
@@ -1105,9 +1105,9 @@ bool CSingleScale::CheckType(const std::string & strValue, long & lResult)
 {
 	std::string::size_type	pos = 0;
 	if ( strx::Eval(strValue, pos, lResult) && (pos == strValue.size()) )
-		return m_err.SetOK();
+		return err.SetOK();
 	else
-		return m_err.SetError("Value type mismatch. Integer expected!", m_lReadLineCount);
+		return err.SetError("Value type mismatch. Integer expected!", m_lReadLineCount);
 }
 
 
@@ -1145,10 +1145,10 @@ bool CSingleScale::SetDate(std::string strDate)
 	if ( IsDateFormatOK(strDate) )
 	{
 		m_strDate = strDate;
-		return m_err.SetOK();
+		return err.SetOK();
 	}
 	else
-		return m_err.SetError("Date format mismatch. YYYY-MM-DD expected!");
+		return err.SetError("Date format mismatch. YYYY-MM-DD expected!");
 }
 
 
@@ -1206,7 +1206,7 @@ bool CSingleScale::SetMIDIChannelsAssignment(std::string strMIDIChannels)
 		CMIDIChannelRange	mcr;
 		if ( !mcr.SetFromStr(*it) )
 		{
-			m_err.SetError("Error in MIDI channel range: syntax error or values exceed the range 1-65535!", m_lReadLineCount);
+			err.SetError("Error in MIDI channel range: syntax error or values exceed the range 1-65535!", m_lReadLineCount);
 			return false;
 		}
 		m_lmcrChannels.push_back(mcr);

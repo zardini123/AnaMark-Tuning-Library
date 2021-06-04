@@ -22,7 +22,7 @@ TEST_CASE( "SCL KBM Basic Classes" )
     {
         TUN::CSCL_Import scli;
         REQUIRE( scli.ReadSCL( TestUtils::testFile( "12-intune.scl" ).c_str() ) );
-        REQUIRE( scli.Err().IsOK() );
+        REQUIRE( scli.GetError().IsOK() );
 
         TUN::CSingleScale s;
         scli.SetSingleScale(s);

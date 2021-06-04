@@ -256,12 +256,12 @@ public:
 	{
 		// Gets the sign of the amount of times to loop
 		// The sign will determine which direction to loop
-		long lInc = ( m_lLoop >= 0 ? +1 : -1 );
-		long l = 0;
+		long nextLoopIndexAdder = ( m_lLoop >= 0 ? +1 : -1 );
+		long loopIndexOffset = 0;
 		do
 		{
 			// The current note index in regards to the entire scale
-			long	scaleNoteIndex = m_lMyIndex + l;
+			long	scaleNoteIndex = m_lMyIndex + loopIndexOffset;
 			// scaleNoteIndex can never be greater than MaxNumOfNotes, as vector
 			// 		vdblNoteFrequenciesHz's size is of MaxNumOfNotes
 			if ( (scaleNoteIndex < 0) || (scaleNoteIndex >= MaxNumOfNotes) )
@@ -290,8 +290,8 @@ public:
 				vdblNoteFrequenciesHz.at(scaleNoteIndex) =
 					dblRangeHz * m_dblMUL / m_dblDIV * pow(2, m_dblCENTS/1200) + dblShiftHz;
 			}
-			l += lInc;
-		} while ( std::abs(l) < std::abs(m_lLoop) );
+			loopIndexOffset += nextLoopIndexAdder;
+		} while ( std::abs(loopIndexOffset) < std::abs(m_lLoop) );
 	}
 
 // Parameters of the formula

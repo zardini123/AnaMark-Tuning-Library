@@ -1,5 +1,5 @@
 /// \file
-// 
+//
 // SCL_Import.cpp: Implementierung der Klasse CSCL_Import.
 //
 // (C)opyright in 2009 by Mark Henning, Germany
@@ -122,11 +122,10 @@ bool CSCL_Import::ReadKBM(const char * szFilepath)
 	std::ifstream	ifstr(szFilepath, std::ios_base::in | std::ios_base::binary);
 
 	if ( !ifstr )
-		return m_err.SetError("Error opening the file.");
+		return err.SetError("Error opening the file.");
 
 	// String which will receive the current line from the file
 	CStringParser	strparser;
-	strparser.InitStreamReading();
 
 	// Initialize data
 	// Important, because notes not listed in the tuning file
@@ -159,7 +158,7 @@ bool CSCL_Import::ReadKBM(std::istream & istr, CStringParser & strparser)
 	{
 		// Get next line
 		if ( !strparser.GetLineAndTrim(istr, m_lReadLineCount) )
-			return m_err.SetError("Premature end of file.", m_lReadLineCount);
+			return err.SetError("Premature end of file.", m_lReadLineCount);
 		// Skip empty lines and comments
 		if ( strparser.str().empty() || (strparser.str().at(0) == '!') )
 			continue;
@@ -197,7 +196,7 @@ bool CSCL_Import::ReadKBM(std::istream & istr, CStringParser & strparser)
 		}
 
 		if ( !bValueOK )
-			return m_err.SetError("Setting out of range.", m_lReadLineCount);
+			return err.SetError("Setting out of range.", m_lReadLineCount);
 	} while ( lSettingCounter < 6 );
 
 	// Read the mapping entries
@@ -233,7 +232,7 @@ bool CSCL_Import::ReadKBM(std::istream & istr, CStringParser & strparser)
 		// Skip empty lines and comments
 		if ( strparser.str().empty() || (strparser.str().at(0) == '!') )
 			continue;
-		return m_err.SetError("End of file expected, but additional data found.", m_lReadLineCount);
+		return err.SetError("End of file expected, but additional data found.", m_lReadLineCount);
 	}
 
 	return true; // Everything nice!
@@ -247,11 +246,10 @@ bool CSCL_Import::ReadSCL(const char * szFilepath)
 	std::ifstream	ifstr(szFilepath, std::ios_base::in | std::ios_base::binary);
 
 	if ( !ifstr )
-		return m_err.SetError("Error opening the file.");
+		return err.SetError("Error opening the file.");
 
 	// String which will receive the current line from the file
 	CStringParser	strparser;
-	strparser.InitStreamReading();
 
 	// Initialize data
 	// Important, because notes not listed in the tuning file
@@ -309,7 +307,7 @@ bool CSCL_Import::ReadSCL(std::istream & istr, CStringParser & strparser)
 			m_lScaleSize = atol(strparser.str().c_str());
 			// Check number of notes. Must be from 1 to 127. Other tunings are rejected
 			if ( (m_lScaleSize < 1) || (m_lScaleSize > 127) )
-				return m_err.SetError("Scale size not allowed. Must be within [1;127].", m_lReadLineCount);
+				return err.SetError("Scale size not allowed. Must be within [1;127].", m_lReadLineCount);
 
 			// First note has always 1/1 tuning
 			m_dblScaleCents[0] = 0;
@@ -318,10 +316,10 @@ bool CSCL_Import::ReadSCL(std::istream & istr, CStringParser & strparser)
 		}
 
 		if ( ++lCurrNote > m_lScaleSize )
-			return m_err.SetError("End of file expected, but further data found.", m_lReadLineCount);
+			return err.SetError("End of file expected, but further data found.", m_lReadLineCount);
 
 		// Check for ratio or cent value (cent values contain a '.')
-		std::string::size_type	posMaybePeriod = 
+		std::string::size_type	posMaybePeriod =
 									strparser.str().find_first_not_of("+-0123456789");
 		if ( (posMaybePeriod == std::string::npos) || (strparser.str().at(posMaybePeriod) != '.') )
 		{
@@ -334,11 +332,11 @@ bool CSCL_Import::ReadSCL(std::istream & istr, CStringParser & strparser)
 			{
 				double	dblNumber2 = strtod(++szCurr, NULL);
 				if ( dblNumber2 == 0 )
-					return m_err.SetError("Division by zero.", m_lReadLineCount);
+					return err.SetError("Division by zero.", m_lReadLineCount);
 				m_dblScaleCents[lCurrNote] = TUN::Factor2Cents(dblNumber1 / dblNumber2);
 			}
 			else
-				return m_err.SetError("Unknown operator. '/' expected.", m_lReadLineCount);
+				return err.SetError("Unknown operator. '/' expected.", m_lReadLineCount);
 		}
 		else
 		{
@@ -348,9 +346,9 @@ bool CSCL_Import::ReadSCL(std::istream & istr, CStringParser & strparser)
 	} // while (true)
 
 	if ( (!bNameRead) || (m_lScaleSize < 0) )
-		return m_err.SetError("No data in file.", m_lReadLineCount);
+		return err.SetError("No data in file.", m_lReadLineCount);
 	if ( lCurrNote < m_lScaleSize )
-		return m_err.SetError("Less tuning entries found than expected.", m_lReadLineCount);
+		return err.SetError("Less tuning entries found than expected.", m_lReadLineCount);
 
 	return true; // Everything nice!
 }

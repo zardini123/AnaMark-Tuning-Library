@@ -1,86 +1,26 @@
-# based off of the official .clang-format style for https://github.com/taocpp
-#
-# clang-format -i -style=file $(find . -name '[^.]*.[hc]pp')
-
 Language: Cpp
 Standard: Latest
 
-AccessModifierOffset: -3
-AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-AlignEscapedNewlinesLeft: false
-AlignOperands: true
-AlignTrailingComments: true
-AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
-AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Empty
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
-AlwaysBreakAfterReturnType: None
-AlwaysBreakBeforeMultilineStrings: false
-AlwaysBreakTemplateDeclarations: Yes
-BinPackArguments: false
-BinPackParameters: false
-BraceWrapping:
-  AfterClass: true
-  AfterControlStatement: false
-  AfterEnum: true
-  AfterFunction: true
-  AfterNamespace: true
-  AfterStruct: true
-  AfterUnion: true
-  AfterExternBlock: true
-  BeforeCatch: true
-  BeforeElse: true
-  IndentBraces: false
-  SplitEmptyFunction: false
-  SplitEmptyRecord: false
-  SplitEmptyNamespace: false
-BreakBeforeBinaryOperators: All
-BreakBeforeBraces: Custom
-BreakBeforeTernaryOperators: false
-BreakConstructorInitializers: BeforeColon
-BreakInheritanceList: BeforeColon
-BreakStringLiterals: false
-ColumnLimit: 0
-CompactNamespaces: false
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ConstructorInitializerIndentWidth: 3
-ContinuationIndentWidth: 3
-Cpp11BracedListStyle: false
-DerivePointerAlignment: false
-DisableFormat: false
-ExperimentalAutoDetectBinPacking: false
-FixNamespaceComments: true
-IncludeBlocks: Preserve
-IndentCaseLabels: true
-IndentPPDirectives: None
+ColumnLimit: 85
 IndentWidth: 2
-IndentWrappedFunctionNames: false
-KeepEmptyLinesAtTheStartOfBlocks: false
-MaxEmptyLinesToKeep: 1
-NamespaceIndentation: All
-PointerAlignment: Left
-SortIncludes: true
-SortUsingDeclarations: false
-
-ReflowComments: false
-SpaceAfterCStyleCast: false
-SpaceAfterTemplateKeyword: false
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeCpp11BracedList: false
-SpaceBeforeCtorInitializerColon: true
-SpaceBeforeInheritanceColon: true
-SpaceBeforeParens: ControlStatements
-SpaceBeforeRangeBasedForLoopColon: true
-SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 2
-SpacesInAngles: true
-SpacesInCStyleCastParentheses: false
-SpacesInParentheses: false
-SpacesInSquareBrackets: true
 
 TabWidth: 8
 UseTab: Never
+
+# Only merge empty functions onto a single line
+AllowShortFunctionsOnASingleLine: Empty
+
+# If true, short case labels will be contracted to a single line.
+AllowShortCaseLabelsOnASingleLine: true
+
+# Used for having elements of a list each be on its own line
+# A comma is needed before the last bracket and the last element to get this effect fully
+# https://stackoverflow.com/questions/64298378/separate-each-entry-of-brace-enclosed-lists-with-new-line-via-clang-format/64358501#64358501
+BinPackArguments: false
+
+# Force return type to be same line of function declaration by making penalty of not doing so very large
+# From: https://stackoverflow.com/questions/26635370/in-clang-format-what-do-the-penalties-do
+PenaltyReturnTypeOnItsOwnLine: 100000
+
+# Always make a newline after template declarations
+AlwaysBreakTemplateDeclarations: Yes

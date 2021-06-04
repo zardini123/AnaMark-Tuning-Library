@@ -105,19 +105,12 @@ std::string HTMLEntities(const std::string & str);
 
 
 
-class CEmbedHTML
+class CEmbedHTML : public ProvidesErrorMessage
 {
 public:
 	// strTemplate can be a file path or the template content itself
 	CEmbedHTML(std::string strTemplate, bool bTemplateIsFile = true);
 	virtual ~CEmbedHTML();
-
-
-	// Error handling
-	const CErr &	Err() const { return m_err; }
-private:
-	CErr	m_err;
-public:
 
 
 
