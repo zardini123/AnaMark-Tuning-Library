@@ -7,6 +7,9 @@ namespace AnaMark {
 
 class ScaleManager : public ProvidesErrorMessage {
 
+  double FrequencyAtScaleNote(int scaleNote, int midiChannel) {
+    
+  }
 };
 } // namespace AnaMark
 
