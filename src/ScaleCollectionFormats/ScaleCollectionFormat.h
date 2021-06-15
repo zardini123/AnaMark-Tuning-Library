@@ -21,7 +21,7 @@ public:
   virtual void ReadDirectlyToManager(ScaleManager &collectionToOverwrite,
                                      std::istream &inputStream) = 0;
 
-  void Read(std::istream &inputStream) override {
+  void Read(std::istream &inputStream) {
     return ReadDirectlyToManager(this->transactionManager, inputStream);
   }
 
@@ -36,14 +36,13 @@ public:
                                 std::ostream &outputStream,
                                 VersionNumber formatVersion) {
     FormatVersionRange range;
-    range.startingFormatInclusive = 0;
-    range.endingFormatInclusive = formatVersion;
+    range.startingVersionInclusive = 0;
+    range.endingVersionInclusive = formatVersion;
     return WriteDirectlyFromManager(
         collectionToReadFromImmediately, outputStream, range);
   }
 
-  void Write(std::ostream &outputStream,
-             VersionNumber formatVersionToWrite) override {
+  void Write(std::ostream &outputStream, VersionNumber formatVersionToWrite) {
     return WriteDirectlyFromManager(
         this->transactionManager, outputStream, formatVersionToWrite);
   }

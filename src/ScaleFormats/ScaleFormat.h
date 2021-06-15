@@ -20,21 +20,21 @@ public:
 
   // Requirements are properties of a SingleScale that is required for a format to
   // exist
-  struct Requirements {
-    bool scaleInformation : 1;
-    bool keyboardMapping : 1;
+  enum class Requirements {
+    ScaleInformation = 0b1,
+    KeyboardMapping = 0b10,
   };
 
   // Capabilities are properties of a SingleScale that may or may not be required by
   // a format, but may result in informational loss if exporting to such format if
   // the SingleScale contains the information
-  struct Capabilities {
-    bool scaleInformation : 1;
-    bool keyboardMapping : 1;
-    bool scaleName : 1;
-    bool explicit0To127MIDINoteMapping : 1;
-    bool periodicScale : 1;
-    bool requestMIDIChannelAssignment : 1;
+  enum class Capabilities {
+    ScaleInformation = 0b1,
+    KeyboardMapping = 0b10,
+    ScaleName = 0b100,
+    Explicit0To127MIDINoteMapping = 0b1000,
+    PeriodicScale = 0b10000,
+    RequestMIDIChannelAssignment = 0b100000,
   };
 
   class RequirementsNotPresentException : public Requirements {};
@@ -80,8 +80,20 @@ public:
   virtual void ReadDirectlyToScale(SingleScale &scaleToOverwrite,
                                    std::istream &inputStream) = 0;
 
-  void Read(std::istream &inputStream) override {
+  void Read(std::istream &inputStream) {
     ReadDirectlyToScale(this->transactionScale, inputStream);
+  }
+
+  void Read(const char *inputFilePath) {
+    std::ifstream inputFile;
+    // Set stream to throw exception on failbit or badbit being set
+    inputFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    inputFile.open(inputFilePath);
+
+    Read(inputFile);
+
+    inputFile.close();
   }
 
   ////////////////////////////
@@ -100,10 +112,25 @@ public:
     WriteDirectlyFromScale(scaleToReadFromImmediately, outputStream, range);
   }
 
-  void Write(std::ostream &outputStream,
-             VersionNumber formatVersionToWrite) override {
+  void Write(std::ostream &outputStream, VersionNumber formatVersionToWrite) {
     WriteDirectlyFromScale(
         this->transactionScale, outputStream, formatVersionToWrite);
+  }
+
+  void Write(std::ostream &outputStream) {
+    Write(outputStream, NewestVersion());
+  }
+
+  void Write(const char *outputFilePath) {
+    std::ofstream outputFile;
+    // Set stream to throw exception on failbit or badbit being set
+    outputFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    outputFile.open(outputFilePath);
+
+    Write(outputFile);
+
+    outputFile.close();
   }
 
 protected:

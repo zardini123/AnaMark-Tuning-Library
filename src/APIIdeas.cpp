@@ -1,6 +1,6 @@
 #include "ScaleCollectionFormats/ScaleCollectionFormat.h"
-#include "ScaleFormats/ScaleFormat.h"
 #include "ScaleFormats/TUN.h"
+#include "SingleScale.h"
 
 using namespace AnaMark;
 
@@ -167,10 +167,10 @@ int main(int argc, char const *argv[]) {
   {
     SingleScale scale; // been used, initalized
 
-    // MTS can update multiple notes using one message
+    // Called from the plugin constructor
+    MTS_ESP mtsESPManager();
 
-    // NoteFrequency note = MTS::Convert(mtsMessageBuffer, mtsMessageBufferLength);
-    // scale.UpdateUsing(note);
+    // mtsESPManager is desturcted in plugin destructor
   }
 
   return 0;

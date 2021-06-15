@@ -1,3 +1,14 @@
+#ifndef ANAMARK_TUNING_LIBRARY_SRC_DYNAMIC_SCALE_FORMATS_MTS_ESP_H_
+#define ANAMARK_TUNING_LIBRARY_SRC_DYNAMIC_SCALE_FORMATS_MTS_ESP_H_
+
+#include "DynamicScaleFormat.h"
+
+class MTS_ESP : public DynamicScaleFormat {
+
+}
+
+#endif // ANAMARK_TUNING_LIBRARY_SRC_DYNAMIC_SCALE_FORMATS_MTS_ESP_H_
+
 // Access tuning for note.  MTS-ESP only has NoteToFrequency and ShouldFilterNote.
 // If note access for scale is outside 0-127
 // and dynamic sale input format is 0-127 bound, see what formula affects queried
