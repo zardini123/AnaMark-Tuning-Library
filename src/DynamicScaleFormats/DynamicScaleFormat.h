@@ -4,16 +4,30 @@
 namespace AnaMark {
 
 class DynamicScaleFormat : public Format {
-
-  // Capabilities are properties of a SingleScale that may or may not be required by
-  // a format, but may result in informational loss if exporting to such format if
-  // the SingleScale contains the information
+public:
   enum class Capabilities {
-    InputNotesToScale = 0b1,
-    OutputNotesFromScale = 0b10,
-    InputMultiChannelNotesToScale = 0b100,
-    OutputMultiChannelNotesFromScale = 0b1000,
+    InputNotesToScale = 1 << 0,
+    OutputNotesFromScale = 1 << 1,
+    InputMultiChannelNotesToScale = 1 << 2,
+    OutputMultiChannelNotesFromScale = 1 << 3,
   };
+
+  enum class Assignment {
+    Input = 1 << 0,
+    Output = 1 << 1,
+    InputAndOutput = Input | Output,
+  };
+
+  virtual const Flags<Capabilities> FormatCapabilities(
+      VersionNumber versionNumber) = 0;
+
+  // I want to send my changes to a scale
+  // I want a scale to send its changes to me
+
+  // RegisterOutputScale(SingleScale *)
+  // RegisterInputScale(SingleScale *)
+
+  // RegisterOutputScales()
 };
 
 } // namespace AnaMark

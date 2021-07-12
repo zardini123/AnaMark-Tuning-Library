@@ -51,76 +51,79 @@ int main(int argc, char const *argv[]) {
 
     ScaleFormats::TUN scaleImport;
     scaleImport.Read("File");
-    // User if statement for invalid file, etc.
-    // User should not import if fail
+    // Will throw exception if file does not exist, and if there is a parsing error
+    // in the file itself.
 
     scale.Import(scaleImport);
     // KBM can effect the scale even when equal tempermant.
     // Is there any possible errors to catch??
   }
 
-  {                    // Filename argument constructor for ScaleFormat
-    SingleScale scale; // been used, initalized
-
-    ScaleFormats::TUN scaleImport("File");
-    // User if statement for invalid file, etc.
-
-    scale.Import(scaleImport);
-  }
+  // {                    // Filename argument constructor for ScaleFormat
+  //   SingleScale scale; // been used, initalized
+  //
+  //   ScaleFormats::TUN scaleImport("File");
+  //   // User if statement for invalid file, etc.
+  //
+  //   scale.Import(scaleImport);
+  // }
 
   {
     SingleScale scale; // been used, initalized
 
-    ScaleFormats::TUN export;
-    scale.Export(export);
+    ScaleFormats::TUN scaleExport;
+    scale.Export(scaleExport);
     // Check for compatibility mismatch, therefore information loss
     // User should reject if undesired
     // USERS MUST CHECK THIS
-    export.Write("File");
+    scaleExport.Write("File");
   }
 
-  {
-    SingleScale scale; // been used, initalized
-
-    ScaleFormats::TUN export(scale);
-    // Check for compatibility mismatch
-    export.Write("File");
-  }
+  // {
+  //   SingleScale scale; // been used, initalized
+  //
+  //   ScaleFormats::TUN scaleExport(scale);
+  //   // Check for compatibility mismatch
+  //   scaleExport.Write("File");
+  // }
 
   // Scale conversion
-  {
-    // Should this be allowed?
-    ScaleFormats::TUN tun;
-    tun.Read("File");
+  // {
+  //   // Should this be allowed?
+  //   ScaleFormats::TUN tun;
+  //   tun.Read("File");
+  //
+  //   ScaleFormats::SCL::Write(tun);
+  // }
 
-    ScaleFormats::SCL::Write(tun);
-  }
-
-  // Full read/write
+  // Export has no information to work off of.  I.e. export KBM to SCL
   {
     SingleScale scale; // been used, initalized
 
     ScaleFormats::KBM kbmImport;
     kbmImport.Read("File");
-    // User if statement for invalid file, etc.
-    // User should not import if fail
+    // Will throw exception if file does not exist, and if there is a parsing error
+    // in the file itself.
 
+    // Scale only contains keyboard mapping information, no scale information
+    // currently.
     scale.Import(kbmImport);
 
     ScaleFormats::SCL sclExport;
 
-    if (scale.CheckIncompatibilityOfExport(sclExport)) {
-      ScaleFormat::Requirements scaleMissing = sclExport.RequirementsNotInScale();
+    if (scale.CheckIfMissingRequirementsForExport(sclExport)) {
+      ScaleFormat::Requirements informationMissing =
+          sclExport.RequirementsNotInScale();
 
-      if (scaleMissing.scaleInformation) {
+      if (informationMissing.scaleInformation) {
         // Show error to user that scale does not contain scale information and
         // therefore cannot export
-      } else if (scaleMissing.keyboardMapping) {
+      } else if (informationMissing.keyboardMapping) {
         // Show error to user that scale does not contain keyboard mapping and
         // therefore cannot export
       }
     } else {
-      if (scale.CheckLossesOfExport(sclExport)) {
+      if (scale.CheckForLossesInExport(sclExport)) {
         ScaleFormat::Compaibilies losses =
             sclExport.CompatabilitiesNotAvalibleInFormat();
 
@@ -139,9 +142,27 @@ int main(int argc, char const *argv[]) {
       scale.Export(sclExport);
     }
 
-    try {
+    sclExport.Write("File");
+  }
 
-    } catch (RequirementsNotPresentException &requirementsNotPresent) {
+  // Exception based export fail
+  {
+    SingleScale scale; // been used, initalized
+
+    ScaleFormats::KBM kbmImport;
+    kbmImport.Read("File");
+    // Will throw exception if file does not exist, and if there is a parsing error
+    // in the file itself.
+
+    // Scale only contains keyboard mapping information, no scale information
+    // currently.
+    scale.Import(kbmImport);
+
+    ScaleFormats::SCL sclExport;
+
+    try {
+      scale.Export(sclExport);
+    } catch (MissingRequirementsException &requirementsNotPresent) {
 
       if (requirementsNotPresent.scaleInformation) {
         // Show error to user that scale does not contain scale information and
@@ -151,8 +172,6 @@ int main(int argc, char const *argv[]) {
         // therefore cannot export
       }
     }
-
-    sclExport.Write("File");
   }
 
   // Any format

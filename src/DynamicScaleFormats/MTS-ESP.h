@@ -4,7 +4,14 @@
 #include "DynamicScaleFormat.h"
 
 class MTS_ESP : public DynamicScaleFormat {
+  const Flags<Capabilities> FormatCapabilities(VersionNumber versionNumber) {
 
+  }
+
+  void Update() {
+    // If only for single scale, use single channel fallback (-1 midi channel)
+    // If for manager, check all channels
+  }
 }
 
 #endif // ANAMARK_TUNING_LIBRARY_SRC_DYNAMIC_SCALE_FORMATS_MTS_ESP_H_

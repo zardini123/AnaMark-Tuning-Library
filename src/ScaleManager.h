@@ -5,12 +5,14 @@ namespace AnaMark {
 
 class ScaleManager {
 public:
-  // double FrequencyAtScaleNote(int scaleNote, int midiChannel) {
-  //
-  // }
+  double FrequencyAtScaleNote(int scaleNote, int midiChannel) {}
+
+  double ChangeFrequencyAtNote(int scaleNote, int midiChannel, double newFrequency) {
+
+  }
 
 private:
-
+  // Map channel to scale
 };
 } // namespace AnaMark
 

@@ -26,59 +26,39 @@ public:
     return versions;
   }
 
-  const Requirements &FormatRequirements(VersionNumber versionNumber) override {
+  const Flags<Requirements> FormatRequirements(
+      VersionNumber versionNumber) override {
     ThrowIfVersionDoesNotExist(versionNumber);
 
     // All versions of TUN require scale information.  TUN version 2.00 introduced
     // keyboard mapping, though its optional.
-    static Requirements requirements = {
-        .scaleInformation = true,
-        .keyboardMapping = false,
-    };
-    return requirements;
+    return Requirements::ScaleInformation;
   }
 
-  const Capabilities &FormatCapabilities(VersionNumber versionNumber) override {
+  const Flags<Capabilities> FormatCapabilities(
+      VersionNumber versionNumber) override {
     ThrowIfVersionDoesNotExist(versionNumber);
 
     switch (versionNumber) {
     case Version(0, 00):
-      static Capabilities version0Capabilities = {
-          .scaleInformation = true,
-          .keyboardMapping = false,
-          .scaleName = false,
-          .explicit0To127MIDINoteMapping = true,
-          .periodicScale = false,
-          .requestMIDIChannelAssignment = false,
-      };
-      return version0Capabilities;
+      return Flags<Capabilities>(Capabilities::ScaleInformation,
+                                 Capabilities::Explicit0To127MIDINoteMapping);
 
     case Version(1, 00):
-      static Capabilities version1Capabilities = {
-          .scaleInformation = true,
-          .keyboardMapping = true,
-          .scaleName = false,
-          .explicit0To127MIDINoteMapping = true,
-          .periodicScale = true,
-          .requestMIDIChannelAssignment = false,
-      };
-      return version1Capabilities;
+      return Flags<Capabilities>(Capabilities::ScaleInformation,
+                                 Capabilities::KeyboardMapping,
+                                 Capabilities::Explicit0To127MIDINoteMapping,
+                                 Capabilities::PeriodicScale);
 
     case Version(2, 00):
-      static Capabilities version2Capabilities = {
-          .scaleInformation = true,
-          .keyboardMapping = true,
-          .scaleName = true,
-          .explicit0To127MIDINoteMapping = true,
-          .periodicScale = true,
-          .requestMIDIChannelAssignment = true,
-      };
-      return version2Capabilities;
+      return Flags<Capabilities>(Capabilities::ScaleInformation,
+                                 Capabilities::KeyboardMapping,
+                                 Capabilities::ScaleName,
+                                 Capabilities::Explicit0To127MIDINoteMapping,
+                                 Capabilities::PeriodicScale,
+                                 Capabilities::RequestMIDIChannelAssignment);
 
-      // Library developer error for not providing capabilities for all possible
-      // versions
-      // @TODO: Is assert the best way to force a failure in this instance?
-    default: assert(false);
+    default: static_assert(false, "Format version is non-existent for TUN");
     }
   }
 

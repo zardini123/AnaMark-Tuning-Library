@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <fstream>
+#include <type_traits>
 #include <vector>
 
 #include "../Format.h"
@@ -15,43 +16,43 @@ public:
   // Bring Read and Write from Format into ScaleFormat namespace to have proper
   // function overloading with the virtual function.  This "un-hides" the base class
   // "overloads."
-  using Format::Read;
-  using Format::Write;
+  // using Format::Read;
+  // using Format::Write;
 
   // Requirements are properties of a SingleScale that is required for a format to
   // exist
   enum class Requirements {
-    ScaleInformation = 0b1,
-    KeyboardMapping = 0b10,
+    ScaleInformation = 1 << 0,
+    KeyboardMapping = 1 << 1,
   };
 
   // Capabilities are properties of a SingleScale that may or may not be required by
   // a format, but may result in informational loss if exporting to such format if
   // the SingleScale contains the information
   enum class Capabilities {
-    ScaleInformation = 0b1,
-    KeyboardMapping = 0b10,
-    ScaleName = 0b100,
-    Explicit0To127MIDINoteMapping = 0b1000,
-    PeriodicScale = 0b10000,
-    RequestMIDIChannelAssignment = 0b100000,
+    ScaleInformation = 1 << 0,
+    KeyboardMapping = 1 << 1,
+    ScaleName = 1 << 2,
+    Explicit0To127MIDINoteMapping = 1 << 3,
+    PeriodicScale = 1 << 4,
+    RequestMIDIChannelAssignment = 1 << 5,
   };
-
-  class RequirementsNotPresentException : public Requirements {};
 
   ////////////////////////////////////////////////////////
   // Scale Format requirements and compatibility information
   ////////////////////////////////////////////////////////
 
-  virtual const Requirements &FormatRequirements(VersionNumber versionNumber) = 0;
+  virtual const Flags<Requirements> FormatRequirements(
+      VersionNumber versionNumber) = 0;
 
-  const Requirements &FormatRequirements() {
+  const Flags<Requirements> FormatRequirements() {
     return FormatRequirements(NewestVersion());
   }
 
-  virtual const Capabilities &FormatCapabilities(VersionNumber versionNumber) = 0;
+  virtual const Flags<Capabilities> FormatCapabilities(
+      VersionNumber versionNumber) = 0;
 
-  const Capabilities &FormatCapabilities() {
+  const Flags<Capabilities> FormatCapabilities() {
     return FormatCapabilities(NewestVersion());
   }
 
@@ -68,6 +69,21 @@ public:
 
   const std::vector<unsigned char> &RequestedMIDIChannelAssignments() {
     return requestedMIDIChannels;
+  }
+
+  ////////////////////////////////////////////////////////
+  // Scale interface
+  ////////////////////////////////////////////////////////
+
+  void ExportTo(SingleScale &scaleToOverwrite) const {
+    scaleToOverwrite = this->transactionScale;
+  }
+
+  void ImportFrom(SingleScale &scaleToReadFrom) {
+    // @TODO: Need to reset requested MIDI channels.
+    // @TODO: Run function to make scaleToReadFrom as optimal as possible (write
+    // dirty frequencies).
+    this->transactionScale = scaleToReadFrom;
   }
 
   ////////////////////////////////////////////////////////
@@ -143,7 +159,7 @@ private:
   std::vector<unsigned char> requestedMIDIChannels;
 
   SingleScale transactionScale;
-};
+}; // namespace Capabilities
 
 } // namespace AnaMark
 
