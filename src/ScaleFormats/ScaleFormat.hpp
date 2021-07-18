@@ -6,8 +6,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "../Format.h"
-#include "../SingleScale.h"
+#include "../Definitions.hpp"
+#include "../Format.hpp"
+#include "../Scale.hpp"
 
 namespace AnaMark {
 
@@ -19,16 +20,16 @@ public:
   // using Format::Read;
   // using Format::Write;
 
-  // Requirements are properties of a SingleScale that is required for a format to
+  // Requirements are properties of a Scale that is required for a format to
   // exist
   enum class Requirements {
     ScaleInformation = 1 << 0,
     KeyboardMapping = 1 << 1,
   };
 
-  // Capabilities are properties of a SingleScale that may or may not be required by
+  // Capabilities are properties of a Scale that may or may not be required by
   // a format, but may result in informational loss if exporting to such format if
-  // the SingleScale contains the information
+  // the Scale contains the information
   enum class Capabilities {
     ScaleInformation = 1 << 0,
     KeyboardMapping = 1 << 1,
@@ -75,11 +76,11 @@ public:
   // Scale interface
   ////////////////////////////////////////////////////////
 
-  void ExportTo(SingleScale &scaleToOverwrite) const {
+  void ExportTo(Scale &scaleToOverwrite) const {
     scaleToOverwrite = this->transactionScale;
   }
 
-  void ImportFrom(SingleScale &scaleToReadFrom) {
+  void ImportFrom(Scale &scaleToReadFrom) {
     // @TODO: Need to reset requested MIDI channels.
     // @TODO: Run function to make scaleToReadFrom as optimal as possible (write
     // dirty frequencies).
@@ -93,7 +94,7 @@ public:
   ////////////////////////////
   // READ
 
-  virtual void ReadDirectlyToScale(SingleScale &scaleToOverwrite,
+  virtual void ReadDirectlyToScale(Scale &scaleToOverwrite,
                                    std::istream &inputStream) = 0;
 
   void Read(std::istream &inputStream) {
@@ -116,10 +117,10 @@ public:
   // WRITE
 
   virtual void WriteDirectlyFromScale(
-      SingleScale &scaleToReadFromImmediately, std::ostream &outputStream,
+      Scale &scaleToReadFromImmediately, std::ostream &outputStream,
       FormatVersionRange formatVersionRangeToWrite) = 0;
 
-  void WriteDirectlyFromScale(SingleScale &scaleToReadFromImmediately,
+  void WriteDirectlyFromScale(Scale &scaleToReadFromImmediately,
                               std::ostream &outputStream,
                               VersionNumber formatVersion) {
     FormatVersionRange range;
@@ -158,7 +159,7 @@ protected:
 private:
   std::vector<unsigned char> requestedMIDIChannels;
 
-  SingleScale transactionScale;
+  Scale transactionScale;
 }; // namespace Capabilities
 
 } // namespace AnaMark

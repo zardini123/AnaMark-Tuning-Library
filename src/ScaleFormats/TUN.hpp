@@ -1,7 +1,8 @@
 #ifndef ANAMARK_TUNING_LIBRARY_SRC_SCALE_FORMATS_TUN_H_
 #define ANAMARK_TUNING_LIBRARY_SRC_SCALE_FORMATS_TUN_H_
 
-#include "ScaleFormat.h"
+#include "ScaleFormat.hpp"
+
 #include <cassert>
 
 namespace AnaMark {
@@ -58,11 +59,11 @@ public:
                                  Capabilities::PeriodicScale,
                                  Capabilities::RequestMIDIChannelAssignment);
 
-    default: static_assert(false, "Format version is non-existent for TUN");
+    default: throw std::logic_error("Format version is non-existent for TUN");
     }
   }
 
-  void ReadDirectlyToScale(SingleScale &scaleToOverwrite,
+  void ReadDirectlyToScale(Scale &scaleToOverwrite,
                            std::istream &inputStream) override {
     // TUN read implementation needs to be redone using new API.
 
@@ -74,7 +75,7 @@ public:
   }
 
   void WriteDirectlyFromScale(
-      SingleScale &scaleToReadFromImmediately, std::ostream &outputStream,
+      Scale &scaleToReadFromImmediately, std::ostream &outputStream,
       FormatVersionRange formatVersionRangeToWrite) override {
 
     ThrowIfVersionRangeIsInvalid(formatVersionRangeToWrite);

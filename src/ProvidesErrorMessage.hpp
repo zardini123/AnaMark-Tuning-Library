@@ -1,7 +1,7 @@
 #ifndef ANAMARK_TUNING_LIBRARY_SRC_PROVIDES_ERROR_MESSAGE_TUN_H_
 #define ANAMARK_TUNING_LIBRARY_SRC_PROVIDES_ERROR_MESSAGE_TUN_H_
 
-#include "TUN_Error.h"
+#include "TUN_Error.hpp"
 
 namespace AnaMark {
 

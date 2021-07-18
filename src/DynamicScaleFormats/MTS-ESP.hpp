@@ -1,18 +1,85 @@
 #ifndef ANAMARK_TUNING_LIBRARY_SRC_DYNAMIC_SCALE_FORMATS_MTS_ESP_H_
 #define ANAMARK_TUNING_LIBRARY_SRC_DYNAMIC_SCALE_FORMATS_MTS_ESP_H_
 
-#include "DynamicScaleFormat.h"
+#include "DSFScaleRepresentative.hpp"
+#include "DynamicScaleFormat.hpp"
+#include "MTS-ESP/Client/libMTSClient.h"
+#include "MTS-ESP/Master/libMTSMaster.h"
 
-class MTS_ESP : public DynamicScaleFormat {
-  const Flags<Capabilities> FormatCapabilities(VersionNumber versionNumber) {
+#include <array>
+#include <vector>
 
+namespace AnaMark {
+
+class MTS_ESP_Client : public DynamicScaleFormat {
+  class ScaleRepresentative : DSFScaleRepresentativeSender {
+  public:
+    MTS_ESP_Client_ScaleRepresentative() {
+      changedScaleNotesBuffer.reserve(128);
+      changedFrequenciesBuffer.reserve(128);
+    }
+
+  private:
+    void Update() {
+      changedScaleNotesBuffer.clear();
+      changedFrequenciesBuffer.clear();
+
+      for (char scaleNote = 0; scaleNote < 128; ++scaleNote) {
+        double currentFrequency =
+            MTS_NoteToFrequency(mtsClient, scaleNote, midiChannel);
+
+        // Add note as changed if the frequency is different
+        if (currentFrequency != lastUpdateFrequencies[scaleNote]) {
+          changedScaleNotesBuffer.push_back(scaleNote);
+          changedFrequenciesBuffer.push_back(currentFrequency);
+
+          // Store for next update for checking difference
+          lastUpdateFrequencies[scaleNote] = currentFrequency;
+        }
+      }
+
+      this->SendChangesToMediator(changedScaleNotesBuffer, changedFrequenciesBuffer);
+    }
+
+    std::vector<char> changedScaleNotesBuffer;
+    std::vector<double> changedFrequenciesBuffer;
+
+    std::array<double, 128> lastUpdateFrequencies;
+
+    MTSClient *mtsClient = nullptr;
+    // Default to single channel tuning table
+    char midiChannel = -1;
+  };
+
+  MTS_ESP_Client() {
+    mtsClient = MTS_RegisterClient();
   }
+
+  ~MTS_ESP_Client() {
+    MTS_DeregisterClient(mtsClient);
+  }
+
+  // If one scale, single channel
+  // If multiple scales, multi channel
+
+  // Map midi channel to scale representative
 
   void Update() {
-    // If only for single scale, use single channel fallback (-1 midi channel)
-    // If for manager, check all channels
+    for (auto &representative : scaleRepresentatives) {
+      representative.Update();
+    }
   }
-}
+
+private:
+  std::vector<MTS_ESP_Client_ScaleRepresentative> scaleRepresentatives;
+  MTSClient *mtsClient = nullptr;
+};
+
+class MTS_ESP_Master : public DynamicScaleFormat {
+  class ScaleRepresentative : DSFScaleRepresentativeReciever {};
+};
+
+} // namespace AnaMark
 
 #endif // ANAMARK_TUNING_LIBRARY_SRC_DYNAMIC_SCALE_FORMATS_MTS_ESP_H_
 

@@ -24,8 +24,8 @@ public:
   // I want to send my changes to a scale
   // I want a scale to send its changes to me
 
-  // RegisterOutputScale(SingleScale *)
-  // RegisterInputScale(SingleScale *)
+  // RegisterOutputScale(Scale *)
+  // RegisterInputScale(Scale *)
 
   // RegisterOutputScales()
 };

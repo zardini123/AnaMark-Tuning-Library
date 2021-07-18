@@ -1,8 +1,4 @@
-#include "ScaleCollectionFormats/ScaleCollectionFormat.h"
-#include "ScaleFormats/TUN.h"
-#include "SingleScale.h"
-
-using namespace AnaMark;
+#include "AnaMark.hpp"
 
 int main(int argc, char const *argv[]) {
 
@@ -43,11 +39,11 @@ int main(int argc, char const *argv[]) {
   // Cannot allow this as scale needs to be around for all of the synthesizer, even
   // for equal tempermeant. This will also result in KBM being ignored or reading a
   // kbm.
-  // { SingleScale scale = ScaleFormats::TUN::Read("File"); }
-  // { SingleScale scale(ScaleFormats::TUN::Read("File")); }
+  // { Scale scale = ScaleFormats::TUN::Read("File"); }
+  // { Scale scale(ScaleFormats::TUN::Read("File")); }
 
   {
-    SingleScale scale; // been used, initalized
+    Scale scale; // been used, initalized
 
     ScaleFormats::TUN scaleImport;
     scaleImport.Read("File");
@@ -60,7 +56,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // {                    // Filename argument constructor for ScaleFormat
-  //   SingleScale scale; // been used, initalized
+  //   Scale scale; // been used, initalized
   //
   //   ScaleFormats::TUN scaleImport("File");
   //   // User if statement for invalid file, etc.
@@ -69,7 +65,7 @@ int main(int argc, char const *argv[]) {
   // }
 
   {
-    SingleScale scale; // been used, initalized
+    Scale scale; // been used, initalized
 
     ScaleFormats::TUN scaleExport;
     scale.Export(scaleExport);
@@ -80,7 +76,7 @@ int main(int argc, char const *argv[]) {
   }
 
   // {
-  //   SingleScale scale; // been used, initalized
+  //   Scale scale; // been used, initalized
   //
   //   ScaleFormats::TUN scaleExport(scale);
   //   // Check for compatibility mismatch
@@ -98,7 +94,7 @@ int main(int argc, char const *argv[]) {
 
   // Export has no information to work off of.  I.e. export KBM to SCL
   {
-    SingleScale scale; // been used, initalized
+    Scale scale; // been used, initalized
 
     ScaleFormats::KBM kbmImport;
     kbmImport.Read("File");
@@ -147,7 +143,7 @@ int main(int argc, char const *argv[]) {
 
   // Exception based export fail
   {
-    SingleScale scale; // been used, initalized
+    Scale scale; // been used, initalized
 
     ScaleFormats::KBM kbmImport;
     kbmImport.Read("File");
@@ -176,7 +172,7 @@ int main(int argc, char const *argv[]) {
 
   // Any format
   {
-    SingleScale scale; // been used, initalized
+    Scale scale; // been used, initalized
 
     ScaleFormats::AnyFormat anyImport("File");
     scale.Import(anyImport);
@@ -184,7 +180,7 @@ int main(int argc, char const *argv[]) {
 
   // Dynamic scale
   {
-    SingleScale scale; // been used, initalized
+    Scale scale; // been used, initalized
 
     // Called from the plugin constructor
     MTS_ESP mtsESPManager();

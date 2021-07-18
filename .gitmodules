@@ -1,0 +1,3 @@
+[submodule "src/DynamicScaleFormats/MTS-ESP"]
+	path = src/DynamicScaleFormats/MTS-ESP
+	url = https://github.com/ODDSound/MTS-ESP.git
