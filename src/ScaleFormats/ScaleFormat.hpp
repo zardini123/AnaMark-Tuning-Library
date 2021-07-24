@@ -6,9 +6,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "../Definitions.hpp"
 #include "../Format.hpp"
 #include "../Scale.hpp"
+#include "../Utilities.hpp"
 
 namespace AnaMark {
 

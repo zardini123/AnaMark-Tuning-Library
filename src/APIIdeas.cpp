@@ -1,37 +1,44 @@
-#include "AnaMark.hpp"
+#include "DynamicScaleFormats/MTS-ESP-Client.hpp"
+#include "DynamicScaleFormats/MTS.hpp"
+#include "Scale.hpp"
+#include "ScaleFormats/TUN.hpp"
+
+using namespace AnaMark;
 
 int main(int argc, char const *argv[]) {
 
   /////////////////////////
   // Scale Collection
 
-  // {
-  //   ScaleCollection collection;
-  //
-  //   ScaleFormats::TUN scaleImport;
-  //   scaleImport.Read("File");
-  //   // User if statement for invalid file, etc.
-  //   // User should not import if fail
-  //
-  //   // Defaults to all channels
-  //   collection.Import(scaleImport);
-  //
-  //   // Import to channel 0
-  //   collection.Import(scaleImport, 0);
-  // }
-  //
-  // {
-  //   ScaleCollection collection;
-  //
-  //   ScaleCollectionFormats::MSF msfImport;
-  //   msfImport.Read("File");
-  //   // Check if valid read
-  //   // Can probably extract the single scales at this point
-  //
-  //   // Scale collection import
-  //   // What is a scale collection?
-  //   collection.Import(msfImport);
-  // }
+  /*
+  {
+    ScaleCollection collection;
+
+    ScaleFormats::TUN scaleImport;
+    scaleImport.Read("File");
+    // User if statement for invalid file, etc.
+    // User should not import if fail
+
+    // Defaults to all channels
+    collection.Import(scaleImport);
+
+    // Import to channel 0
+    collection.Import(scaleImport, 0);
+  }
+
+  {
+    ScaleCollection collection;
+
+    ScaleCollectionFormats::MSF msfImport;
+    msfImport.Read("File");
+    // Check if valid read
+    // Can probably extract the single scales at this point
+
+    // Scale collection import
+    // What is a scale collection?
+    collection.Import(msfImport);
+  }
+  */
 
   /////////////////////////
   // Single Scale
@@ -42,6 +49,7 @@ int main(int argc, char const *argv[]) {
   // { Scale scale = ScaleFormats::TUN::Read("File"); }
   // { Scale scale(ScaleFormats::TUN::Read("File")); }
 
+#if 0
   {
     Scale scale; // been used, initalized
 
@@ -178,12 +186,23 @@ int main(int argc, char const *argv[]) {
     scale.Import(anyImport);
   }
 
+#endif
+
   // Dynamic scale
   {
     Scale scale; // been used, initalized
 
     // Called from the plugin constructor
-    MTS_ESP mtsESPManager();
+    MTSESPClient mtsESPManager;
+
+    scale.AttachToStateProvider(&mtsESPManager.GetSingleChannelScaleRep());
+
+    MTS mts;
+
+    scale.AttachToChangeProvider(&mts);
+
+    scale.DetachFromChangeProvider();
+    scale.DetachFromStateProvider();
 
     // mtsESPManager is desturcted in plugin destructor
   }

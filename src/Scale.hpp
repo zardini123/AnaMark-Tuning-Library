@@ -1,10 +1,7 @@
 #ifndef ANAMARK_TUNING_LIBRARY_SRC_SCALE_H_
 #define ANAMARK_TUNING_LIBRARY_SRC_SCALE_H_
 
-// Cannot include ChangeMediator.hpp as it makes incomplete type compile errors.
-// Compiles without including due to inclusion in DSFScaleRepresentative.hpp
-#include "ChangeMediator.hpp"
-// #include "DynamicScaleFormats/DSFScaleRepresentative.hpp"
+#include "AttacherProvider.hpp"
 
 #include <array>
 #include <bitset>
@@ -15,7 +12,11 @@ namespace AnaMark {
 
 class FormulaSet {};
 
-class Scale {
+class Scale : public ChangeAttacher,
+              public ChangeProvider,
+              public StateAttacher,
+              public StateProvider {
+
 public:
   // Range to tune.
   // "If musician wants something to span the compelte range, he has to tune it for
@@ -31,6 +32,10 @@ public:
   // result in output?
 
   double FrequencyAtScaleNote(int scaleNote) {
+    if (IsAttachedToAStateProvider()) {
+      //
+    }
+
     // If in 0-127, grab from inBoundsCache.
     // If outside 0-127, check if inBoundsCacheDirty.
     //    If not dirty, grab from outOfBoundsCache.
@@ -68,26 +73,27 @@ public:
     assert(false);
   }
 
-  void ChangeScaleNoteFrequency(int scaleNote, double newFrequency) {
-    ChangeScaleNoteFrequency(
-        ChangeMediatorSingleton::GetInstance(), scaleNote, newFrequency);
+  bool ChangeScaleNoteFrequency(int scaleNote, double newFrequency) {
+    // Do not allow users to modify frequencies if scale is already tracking a
+    // Provider
+    if (!IsAttachedToAProvider()) {
+      return true;
+    }
+
+    // nullptr as we have no history in this change yet
+    ChangeScaleNoteFrequency(nullptr, scaleNote, newFrequency);
+    return false;
   }
 
-  void ChangeScaleNoteFrequency(ChangeMediator &mediator, int scaleNote,
-                                double newFrequency) {
-    ChangeScaleNoteFrequency(mediator, nullptr, scaleNote, newFrequency);
-  }
-
-  void ChangeScaleNotesFrequencies(std::vector<int> &scaleNotes,
+  bool ChangeScaleNotesFrequencies(std::vector<int> &scaleNotes,
                                    std::vector<double> &newFrequencies) {
-    ChangeScaleNotesFrequencies(
-        ChangeMediatorSingleton::GetInstance(), scaleNotes, newFrequencies);
-  }
+    if (!IsAttachedToAProvider()) {
+      return true;
+    }
 
-  void ChangeScaleNotesFrequencies(ChangeMediator &mediator,
-                                   std::vector<int> &scaleNotes,
-                                   std::vector<double> &newFrequencies) {
-    ChangeScaleNotesFrequencies(mediator, nullptr, scaleNotes, newFrequencies);
+    // nullptr as we have no history in this change yet
+    ChangeScaleNotesFrequencies(nullptr, scaleNotes, newFrequencies);
+    return false;
   }
 
   const FormulaSet &GetFormulas() {
@@ -133,18 +139,35 @@ public:
     assert(false);
   }
 
-private:
-  void OverwriteCachesWithFormulaFrequencies() {
-    // Clear all dirty bits.
-    inBoundCacheDirty = false;
-    inBoundCachePerNoteDirty.reset();
-    // Clear outOfBoundsCache.
-    // Recalculate inBoundCache.
+  void GetNoteState(int scaleNoteToAcquire,
+                    double &scaleNoteFrequencyOutput) override {
+    scaleNoteFrequencyOutput = FrequencyAtScaleNote(scaleNoteToAcquire);
   }
 
-  void ChangeScaleNoteFrequency(ChangeMediator &mediator,
-                                DSFScaleRepresentativeSender *changer, int scaleNote,
-                                double newFrequency) {
+private:
+  void RecieveChangeFromProvider(const ChangeProvider *const changeOrigin,
+                                 const ChangeProvider *const notifier, int scaleNote,
+                                 double newFrequency) override {
+    // Change origin is thrown away in this cycle
+    // Cast to void to mitigate "unused parameter" warnings
+    (void)changeOrigin;
+    // Change origin is now the notifier
+    ChangeScaleNoteFrequency(notifier, scaleNote, newFrequency);
+  }
+
+  void RecieveChangeFromProvider(const ChangeProvider *const changeOrigin,
+                                 const ChangeProvider *const notifier,
+                                 std::vector<int> &scaleNotes,
+                                 std::vector<double> &newFrequencies) override {
+    // Change origin is thrown away in this cycle
+    // Cast to void to mitigate "unused parameter" warnings
+    (void)changeOrigin;
+    // Change origin is now the notifier
+    ChangeScaleNotesFrequencies(notifier, scaleNotes, newFrequencies);
+  }
+
+  void ChangeScaleNoteFrequency(const ChangeProvider *const changeOrigin,
+                                int scaleNote, double newFrequency) {
     // Directly changing one note frequency outside tunable range is ambiguous,
     // therefore disallowed.  Create/modify periodic boundary formulas to modify
     // out-of-bound note frequencies.
@@ -157,19 +180,21 @@ private:
     //    Overwrite inBoundCache at scaleNote.
     //    Set scaleNote to be dirty.
 
-    // Notify subscribers of change in this scale via mediator
-    mediator.ScaleChange(this, changer, scaleNote, newFrequency);
+    this->NotifyAttachersOfChange(changeOrigin, scaleNote, newFrequency);
   }
 
-  void ChangeScaleNotesFrequencies(ChangeMediator &mediator,
-                                   DSFScaleRepresentativeSender *changer,
+  void ChangeScaleNotesFrequencies(const ChangeProvider *const changeOrigin,
                                    std::vector<int> &scaleNotes,
                                    std::vector<double> &newFrequencies) {
-    assert(scaleNotes.size() == newFrequencies.size());
+    this->NotifyAttachersOfChange(changeOrigin, scaleNotes, newFrequencies);
+  }
 
-    // @TODO: Actually change the scale note's frequencies
-
-    mediator.ScaleChanges(this, changer, scaleNotes, newFrequencies);
+  void OverwriteCachesWithFormulaFrequencies() {
+    // Clear all dirty bits.
+    inBoundCacheDirty = false;
+    inBoundCachePerNoteDirty.reset();
+    // Clear outOfBoundsCache.
+    // Recalculate inBoundCache.
   }
 
   std::array<double, TUNABLE_RANGE_SIZE> inBoundCache;

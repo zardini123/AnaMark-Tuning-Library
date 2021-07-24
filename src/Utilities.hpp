@@ -1,7 +1,23 @@
-#ifndef ANAMARK_TUNING_LIBRARY_SRC_DEFINITIONS_H_
-#define ANAMARK_TUNING_LIBRARY_SRC_DEFINITIONS_H_
+#ifndef ANAMARK_TUNING_LIBRARY_SRC_UTILITIES_H_
+#define ANAMARK_TUNING_LIBRARY_SRC_UTILITIES_H_
+
+#include <type_traits>
 
 namespace AnaMark {
+
+namespace Utilities {
+template <typename InputIterator, typename T>
+static InputIterator Find(InputIterator first, InputIterator last, const T &val) {
+  while (first != last) {
+    if (*first == val) {
+      return first;
+    }
+
+    ++first;
+  }
+  return last;
+}
+} // namespace Utilities
 
 template <typename FlagsType,
           typename UnderlyingType = typename std::underlying_type<FlagsType>::type>
@@ -33,4 +49,4 @@ private:
 
 } // namespace AnaMark
 
-#endif // ANAMARK_TUNING_LIBRARY_SRC_DEFINITIONS_H_
+#endif // ANAMARK_TUNING_LIBRARY_SRC_UTILITIES_H_
