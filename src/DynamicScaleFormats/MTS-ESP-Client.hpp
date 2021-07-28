@@ -4,7 +4,7 @@
 #include "../AttacherProvider.hpp"
 #include "DynamicScaleFormat.hpp"
 
-#include "MTS-ESP/Client/libMTSClient.h"
+#include "../../lib/MTS-ESP/Client/libMTSClient.h"
 
 #include <array>
 #include <map>

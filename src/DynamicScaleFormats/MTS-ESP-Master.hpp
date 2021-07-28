@@ -4,7 +4,7 @@
 #include "../AttacherProvider.hpp"
 #include "DynamicScaleFormat.hpp"
 
-#include "MTS-ESP/Master/libMTSMaster.h"
+#include "../../lib/MTS-ESP/Master/libMTSMaster.h"
 
 #include <array>
 #include <vector>
