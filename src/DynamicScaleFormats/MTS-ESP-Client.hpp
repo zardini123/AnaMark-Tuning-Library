@@ -4,7 +4,7 @@
 #include "../AttacherProvider.hpp"
 #include "DynamicScaleFormat.hpp"
 
-#include "MTS-ESP/Client/libMTSClient.cpp"
+#include "MTS-ESP/Client/libMTSClient.h"
 
 #include <array>
 #include <map>
@@ -20,8 +20,20 @@ public:
     ScaleRepresentative(MTSClient *mtsClientIn, char midiChannelIn)
         : mtsClient{mtsClientIn}, midiChannel{midiChannelIn} {}
 
-    void GetNoteState(int scaleNoteToAcquire,
-                      double &scaleNoteFrequencyOutput) override {
+    Flags<Capabilities> StateProviderCapabilities() override {
+      return {
+          Capabilities::ScaleName,
+          Capabilities::FilterMIDINotes,
+      };
+    }
+
+    void HasBeenRequestedState(int scaleNoteToAcquire,
+                               double &scaleNoteFrequencyOutput) override {
+      assert(mtsClient != nullptr);
+      assert(midiChannel >= -1 && midiChannel < 16);
+      // @TODO: Send a rejection message/response stating scaleNoteToAcquire is out
+      // of bounds
+
       scaleNoteFrequencyOutput = MTS_NoteToFrequency(
           mtsClient, static_cast<char>(scaleNoteToAcquire), midiChannel);
     }
@@ -30,23 +42,24 @@ public:
     char midiChannel;
   };
 
-  MTSESPClient() {
-    mtsClient = MTS_RegisterClient();
-  }
+  MTSESPClient()
+      : mtsClient{MTS_RegisterClient()}, singleChannelScaleRep{mtsClient, -1} {}
 
   ~MTSESPClient() {
     MTS_DeregisterClient(mtsClient);
   }
 
-  ScaleRepresentative &GetMultiChannelScaleRep(char midiChannel) {
-    auto existingIt = scaleRepresentatives.insert(
+  ScaleRepresentative &MultiChannel(char midiChannel) {
+    assert(midiChannel >= 0 && midiChannel < 16);
+
+    auto existingIt = multiChannelScaleReps.insert(
         {midiChannel, ScaleRepresentative(mtsClient, midiChannel)});
 
     return existingIt.first->second;
   }
 
-  ScaleRepresentative &GetSingleChannelScaleRep() {
-    return GetMultiChannelScaleRep(-1);
+  ScaleRepresentative &SingleChannel() {
+    return singleChannelScaleRep;
   }
 
   bool ConnectedToAMTSESPMaster() {
@@ -54,8 +67,11 @@ public:
   }
 
 private:
-  std::map<char, ScaleRepresentative> scaleRepresentatives;
-  MTSClient *mtsClient = nullptr;
+  // mtsClient must be first in parameter list here as therefore it will be
+  // initalized first in the initalizer list
+  MTSClient *mtsClient;
+  ScaleRepresentative singleChannelScaleRep;
+  std::map<char, ScaleRepresentative> multiChannelScaleReps;
 };
 
 } // namespace AnaMark

@@ -43,18 +43,16 @@ public:
   // Scale Format requirements and compatibility information
   ////////////////////////////////////////////////////////
 
-  virtual const Flags<Requirements> FormatRequirements(
-      VersionNumber versionNumber) = 0;
+  virtual Flags<Requirements> FormatRequirements(VersionNumber versionNumber) = 0;
 
-  const Flags<Requirements> FormatRequirements() {
-    return FormatRequirements(NewestVersion());
+  Flags<Requirements> FormatRequirements() {
+    return FormatRequirements(this->NewestVersion());
   }
 
-  virtual const Flags<Capabilities> FormatCapabilities(
-      VersionNumber versionNumber) = 0;
+  virtual Flags<Capabilities> FormatCapabilities(VersionNumber versionNumber) = 0;
 
-  const Flags<Capabilities> FormatCapabilities() {
-    return FormatCapabilities(NewestVersion());
+  Flags<Capabilities> FormatCapabilities() {
+    return FormatCapabilities(this->NewestVersion());
   }
 
   ////////////////////////////////////////////////////////
@@ -98,7 +96,7 @@ public:
                                    std::istream &inputStream) = 0;
 
   void Read(std::istream &inputStream) {
-    ReadDirectlyToScale(this->transactionScale, inputStream);
+    ReadDirectlyToScale(transactionScale, inputStream);
   }
 
   void Read(const char *inputFilePath) {
@@ -130,12 +128,11 @@ public:
   }
 
   void Write(std::ostream &outputStream, VersionNumber formatVersionToWrite) {
-    WriteDirectlyFromScale(
-        this->transactionScale, outputStream, formatVersionToWrite);
+    WriteDirectlyFromScale(transactionScale, outputStream, formatVersionToWrite);
   }
 
   void Write(std::ostream &outputStream) {
-    Write(outputStream, NewestVersion());
+    Write(outputStream, this->NewestVersion());
   }
 
   void Write(const char *outputFilePath) {

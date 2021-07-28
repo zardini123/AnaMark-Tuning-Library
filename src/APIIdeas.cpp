@@ -195,7 +195,7 @@ int main(int argc, char const *argv[]) {
     // Called from the plugin constructor
     MTSESPClient mtsESPManager;
 
-    scale.AttachToStateProvider(&mtsESPManager.GetSingleChannelScaleRep());
+    scale.AttachToStateProvider(&mtsESPManager.SingleChannel());
 
     MTS mts;
 

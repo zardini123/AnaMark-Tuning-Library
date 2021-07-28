@@ -27,8 +27,7 @@ public:
     return versions;
   }
 
-  const Flags<Requirements> FormatRequirements(
-      VersionNumber versionNumber) override {
+  Flags<Requirements> FormatRequirements(VersionNumber versionNumber) override {
     ThrowIfVersionDoesNotExist(versionNumber);
 
     // All versions of TUN require scale information.  TUN version 2.00 introduced
@@ -36,28 +35,33 @@ public:
     return Requirements::ScaleInformation;
   }
 
-  const Flags<Capabilities> FormatCapabilities(
-      VersionNumber versionNumber) override {
+  Flags<Capabilities> FormatCapabilities(VersionNumber versionNumber) override {
     ThrowIfVersionDoesNotExist(versionNumber);
 
     switch (versionNumber) {
     case Version(0, 00):
-      return Flags<Capabilities>(Capabilities::ScaleInformation,
-                                 Capabilities::Explicit0To127MIDINoteMapping);
+      return {
+          Capabilities::ScaleInformation,
+          Capabilities::Explicit0To127MIDINoteMapping,
+      };
 
     case Version(1, 00):
-      return Flags<Capabilities>(Capabilities::ScaleInformation,
-                                 Capabilities::KeyboardMapping,
-                                 Capabilities::Explicit0To127MIDINoteMapping,
-                                 Capabilities::PeriodicScale);
+      return {
+          Capabilities::ScaleInformation,
+          Capabilities::KeyboardMapping,
+          Capabilities::Explicit0To127MIDINoteMapping,
+          Capabilities::PeriodicScale,
+      };
 
     case Version(2, 00):
-      return Flags<Capabilities>(Capabilities::ScaleInformation,
-                                 Capabilities::KeyboardMapping,
-                                 Capabilities::ScaleName,
-                                 Capabilities::Explicit0To127MIDINoteMapping,
-                                 Capabilities::PeriodicScale,
-                                 Capabilities::RequestMIDIChannelAssignment);
+      return {
+          Capabilities::ScaleInformation,
+          Capabilities::KeyboardMapping,
+          Capabilities::ScaleName,
+          Capabilities::Explicit0To127MIDINoteMapping,
+          Capabilities::PeriodicScale,
+          Capabilities::RequestMIDIChannelAssignment,
+      };
 
     default: throw std::logic_error("Format version is non-existent for TUN");
     }

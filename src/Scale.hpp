@@ -23,18 +23,38 @@ public:
   // the complete range."
   // Optimize for what musicians consider the common case (0-127 scale notes, or
   // whatever they consider).
-  static constexpr int FIRST_TUNABLE_SCALE_NOTE = 0;
-  static constexpr int AFTER_LAST_TUNABLE_SCALE_NOTE = 128;
-  static constexpr int TUNABLE_RANGE_SIZE =
-      AFTER_LAST_TUNABLE_SCALE_NOTE - FIRST_TUNABLE_SCALE_NOTE;
+  static constexpr int firstTunableScaleNote = 0;
+  static constexpr int afterLastTunableScaleNote = 128;
+  static constexpr int tunableRangeSize =
+      afterLastTunableScaleNote - firstTunableScaleNote;
 
   // Changes to the scale, when should dynamic scale formats that are set to output
   // result in output?
 
-  double FrequencyAtScaleNote(int scaleNote) {
+  double FrequencyForMIDINote(int midiNote) {
     if (IsAttachedToAStateProvider()) {
-      //
+      double frequency = 0.0;
+      // @TODO:  Deal with creating API for if note is unavalible to provide
+      // frequency state for
+      // @TODO:  Deal with creating API for filtered notes
+      RequestState(midiNote, frequency);
+
+      assert(midiNote >= firstTunableScaleNote &&
+             midiNote < afterLastTunableScaleNote);
+
+      inBoundCache[midiNote] = frequency;
+      // @TODO: Deal with updating formula set cache upon change
+
+      return frequency;
     }
+
+    // @TOOD: Create out of bounds logic and caching once formula set logic is
+    // completed
+    assert(midiNote >= firstTunableScaleNote &&
+           midiNote < afterLastTunableScaleNote);
+
+    // @TODO:  Deal with going through MIDI Note to scale note mapping
+    return inBoundCache[midiNote];
 
     // If in 0-127, grab from inBoundsCache.
     // If outside 0-127, check if inBoundsCacheDirty.
@@ -73,9 +93,18 @@ public:
     assert(false);
   }
 
+  // double FrequencyAtScaleNote(int scaleNote) {
+  //   // Direct access to scale, untouched by mapping
+  //   assert(false);
+  // }
+  //
+  // int GetMIDINoteToScaleNoteMapping(int midiNote) {
+  //   assert(false);
+  // }
+
   bool ChangeScaleNoteFrequency(int scaleNote, double newFrequency) {
-    // Do not allow users to modify frequencies if scale is already tracking a
-    // Provider
+    // Do not allow users to modify frequencies if scale is already attached to a
+    // provider.
     if (!IsAttachedToAProvider()) {
       return true;
     }
@@ -87,6 +116,8 @@ public:
 
   bool ChangeScaleNotesFrequencies(std::vector<int> &scaleNotes,
                                    std::vector<double> &newFrequencies) {
+    // Do not allow users to modify frequencies if scale is already attached to a
+    // provider.
     if (!IsAttachedToAProvider()) {
       return true;
     }
@@ -96,53 +127,76 @@ public:
     return false;
   }
 
-  const FormulaSet &GetFormulas() {
-    // Provides a "snapshot" of the current FormulaSet in this Scale.
-    // Dynamic changes made to this scale after this call are not guarenteed to be
-    // reflected instantly.  To have all dynmaic changes be synced with formulas,
-    // UpdateFormulas must be called when the most accurate formulas are needed.
+  // const FormulaSet &GetFormulas() {
+  //   // First updates scale formulas to reflect all previous dynmaic changes made
+  //   to the scale.  This is to be as reflective to the current scale state as
+  //   possible.  Unfortunately the requirement of being as representative as
+  //   possible makes this function slower than others.
+  //
+  //   // Request all possible notes from StateProvider, if attached to one.
+  //
+  //   // If inBoundCache is dirty (inBoundCacheDirty) update formulas before sending
+  //   // out.
+  //   assert(false);
+  // }
 
-    // If inBoundCache is dirty (inBoundCacheDirty) update formulas before sending
-    // out.
-    assert(false);
-  }
+  // @TODO:  Create additions to ChangeProvider API that provides output only when
+  // formulas have (possibly) changed.  It is unknown how much change has been made
+  // to the formulas until the API user requests for the formulas (and therefore the
+  // formula updates occur).
 
-  bool IsDirty() {
-    // Dirty when there has been changes have been made to the scale that are not
-    // reflected in the formulas.
-    assert(false);
-  }
+  // bool IsDirty() {
+  //   // Dirty when there has been changes have been made to the scale that are not
+  //   // reflected in the formulas.
+  //   assert(false);
+  // }
 
-  void UpdateFormulasToReflectChanges() {
-    // Update Scale formulas to reflect all previous dynamic changes made to
-    // the scale.
+  // void UpdateFormulasToReflectChanges() {
+  //   // Update Scale formulas to reflect all previous dynamic changes made to
+  //   // the scale.
+  //
+  //   // Go over every individual dirty note (inBoundCachePerNoteDirty) and update
+  //   as
+  //   // if each dirty note was updated independently.
+  //   assert(false);
+  // }
 
-    // Go over every individual dirty note (inBoundCachePerNoteDirty) and update as
-    // if each dirty note was updated independently.
-    assert(false);
-  }
-
-  void OverwriteScale(const FormulaSet &newFormulasToUse) {
-    // Completely overwrites scale with new formula set.
-    formulaSet = newFormulasToUse;
-    OverwriteCachesWithFormulaFrequencies();
-  }
+  // bool ReplaceFormulaSet(const FormulaSet &newFormulasToUse) {
+  //   // Completely overwrites scale with new formula set.
+  //   // Returns true (error) if cannot replace (due to being attached to provider).
+  //
+  //   formulaSet = newFormulasToUse;
+  //   // OverwriteCachesWithFormulaFrequencies();
+  //   assert(false);
+  // }
 
   // Which should be prioritized, manual formula changes or ChangeScaleNoteFrequency
   // calls?
 
-  unsigned int GetPeriodicity(int scaleNote) {
-    // If inBoundCacheDirty, update formulas, clear dirty bits.
-    // If there are no periodic formulas that overlap scaleNote, return 0 (no
-    // periodicity)
-    // If there are, look at formulas for repeat.
-    assert(false);
+  // unsigned int GetPeriodicity(int scaleNote) {
+  //   // If inBoundCacheDirty, update formulas, clear dirty bits.
+  //   // If there are no periodic formulas that overlap scaleNote, return 0 (no
+  //   // periodicity)
+  //   // If there are, look at formulas for repeat.
+  //   assert(false);
+  // }
+
+  // StateProvider
+
+  Flags<Capabilities> StateProviderCapabilities() override {
+    return {
+        Capabilities::ScaleName,
+        Capabilities::FilterMIDINotes,
+        Capabilities::MIDINoteToScaleNoteMapping,
+    };
   }
 
-  void GetNoteState(int scaleNoteToAcquire,
-                    double &scaleNoteFrequencyOutput) override {
-    scaleNoteFrequencyOutput = FrequencyAtScaleNote(scaleNoteToAcquire);
+  void HasBeenRequestedState(int scaleNoteToAcquire,
+                             double &scaleNoteFrequencyOutput) override {
+    scaleNoteFrequencyOutput = FrequencyForMIDINote(scaleNoteToAcquire);
   }
+
+  // End StateProvider
 
 private:
   void RecieveChangeFromProvider(const ChangeProvider *const changeOrigin,
@@ -171,8 +225,8 @@ private:
     // Directly changing one note frequency outside tunable range is ambiguous,
     // therefore disallowed.  Create/modify periodic boundary formulas to modify
     // out-of-bound note frequencies.
-    assert(scaleNote >= FIRST_TUNABLE_SCALE_NOTE &&
-           scaleNote < AFTER_LAST_TUNABLE_SCALE_NOTE);
+    assert(scaleNote >= firstTunableScaleNote &&
+           scaleNote < afterLastTunableScaleNote);
     // If want to update notes outside 0-127, one must use ProviderTree for that note
     // to then explicity change that/those formula(s).
 
@@ -180,28 +234,39 @@ private:
     //    Overwrite inBoundCache at scaleNote.
     //    Set scaleNote to be dirty.
 
+    inBoundCache[scaleNote] = newFrequency;
+    // @TODO: Deal with formula caching in change
+
     this->NotifyAttachersOfChange(changeOrigin, scaleNote, newFrequency);
   }
 
   void ChangeScaleNotesFrequencies(const ChangeProvider *const changeOrigin,
                                    std::vector<int> &scaleNotes,
                                    std::vector<double> &newFrequencies) {
+    assert(scaleNotes.size() == newFrequencies.size());
+
+    for (std::size_t i = 0; i < scaleNotes.size(); ++i) {
+      inBoundCache[scaleNotes[i]] = newFrequencies[i];
+    }
+
+    // @TODO: Deal with formula caching in change
+
     this->NotifyAttachersOfChange(changeOrigin, scaleNotes, newFrequencies);
   }
 
-  void OverwriteCachesWithFormulaFrequencies() {
-    // Clear all dirty bits.
-    inBoundCacheDirty = false;
-    inBoundCachePerNoteDirty.reset();
-    // Clear outOfBoundsCache.
-    // Recalculate inBoundCache.
-  }
+  // void OverwriteCachesWithFormulaFrequencies() {
+  //   // Clear all dirty bits.
+  //   inBoundCacheDirty = false;
+  //   inBoundCachePerNoteDirty.reset();
+  //   // Clear outOfBoundsCache.
+  //   // Recalculate inBoundCache.
+  // }
 
-  std::array<double, TUNABLE_RANGE_SIZE> inBoundCache;
-  std::bitset<TUNABLE_RANGE_SIZE> inBoundCachePerNoteDirty;
+  std::array<double, tunableRangeSize> inBoundCache;
+  // std::bitset<tunableRangeSize> inBoundCachePerNoteDirty;
   // outOfBoundsCache;
-  FormulaSet formulaSet;
-  bool inBoundCacheDirty = false;
+  // FormulaSet formulaSet;
+  // bool inBoundCacheDirty = false;
 };
 } // namespace AnaMark
 

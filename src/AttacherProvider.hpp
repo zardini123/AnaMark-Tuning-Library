@@ -38,16 +38,28 @@ private:
 
 class StateProvider : public virtual Provider {
 public:
-  virtual void GetNoteState(int scaleNoteToAcquire,
-                            double &scaleNoteFrequencyOutput) = 0;
+  // Capabilities are the properties of a Provider that a Attacher may request of the
+  // Provider.  If a Provider is unable or able to provide certain capabiltiies, a
+  // Attacher may have different logic performed.
+  enum class Capabilities {
+    ScaleName = 1 << 0,
+    FilterMIDINotes = 1 << 1,
+    MIDINoteToScaleNoteMapping = 1 << 2,
+  };
 
-  virtual void GetNoteState(const std::vector<int> &scaleNotesToAcquire,
-                            std::vector<double> &scaleNotesFrequenciesOutput) {
+  virtual Flags<Capabilities> StateProviderCapabilities() = 0;
+
+  virtual void HasBeenRequestedState(int scaleNoteToAcquire,
+                                     double &scaleNoteFrequencyOutput) = 0;
+
+  virtual void HasBeenRequestedState(
+      const std::vector<int> &scaleNotesToAcquire,
+      std::vector<double> &scaleNotesFrequenciesOutput) {
     scaleNotesFrequenciesOutput.clear();
 
     for (int scaleNote : scaleNotesToAcquire) {
       double frequencyOut = 0.0;
-      GetNoteState(scaleNote, frequencyOut);
+      HasBeenRequestedState(scaleNote, frequencyOut);
       scaleNotesFrequenciesOutput.push_back(frequencyOut);
     }
   }
@@ -85,24 +97,24 @@ public:
   }
 
 protected:
-  bool GetNoteState(int scaleNoteToAcquire, double &scaleNoteFrequencyOutput) {
+  bool RequestState(int scaleNoteToAcquire, double &scaleNoteFrequencyOutput) {
     if (!IsAttachedToAProvider()) {
       return true;
     }
 
-    attachedStateProvider->GetNoteState(scaleNoteToAcquire,
-                                        scaleNoteFrequencyOutput);
+    attachedStateProvider->HasBeenRequestedState(scaleNoteToAcquire,
+                                                 scaleNoteFrequencyOutput);
     return false;
   }
 
-  bool GetNoteState(std::vector<int> &scaleNotesToAcquire,
+  bool RequestState(std::vector<int> &scaleNotesToAcquire,
                     std::vector<double> &scaleNotesFrequenciesOutput) {
     if (!IsAttachedToAProvider()) {
       return true;
     }
 
-    attachedStateProvider->GetNoteState(scaleNotesToAcquire,
-                                        scaleNotesFrequenciesOutput);
+    attachedStateProvider->HasBeenRequestedState(scaleNotesToAcquire,
+                                                 scaleNotesFrequenciesOutput);
     return false;
   }
 
@@ -221,36 +233,6 @@ inline void ChangeProvider::NotifyAttachersOfChange(
         changeOrigin, this, scaleNotes, newFrequencies);
   }
 }
-
-/*
-template <unsigned int MaxRegistrations = std::numeric_limits<unsigned int>::max()>
-class ChangeAttacherLimitedRegistrations : public ChangeAttacher {
-public:
-  bool CanAddNewAttacher() override {
-    return subjectsUsingThis.size() < MaxRegistrations;
-  }
-
-private:
-  void RegisteredWithProvider(ChangeProvider *subjectWasAdded) override {
-    subjectsUsingThis.push_back(subjectWasAdded);
-  }
-
-  void DeregisteredWithProvider(ChangeProvider *subjectWasRemoved) override {
-    auto existingProviderIt = Utilities::Find(
-        subjectsUsingThis.begin(), subjectsUsingThis.end(), subjectWasRemoved);
-
-    if (existingProviderIt == subjectsUsingThis.end()) {
-      // @TODO: Throw exception stating observer does not exist or has already been
-      // removed.
-      assert(false);
-    }
-
-    subjectsUsingThis.erase(existingProviderIt);
-  }
-
-  std::vector<ChangeProvider *> subjectsUsingThis;
-};
-*/
 
 } // namespace AnaMark
 
