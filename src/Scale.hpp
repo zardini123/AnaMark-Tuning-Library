@@ -42,7 +42,11 @@ public:
       assert(midiNote >= firstTunableScaleNote &&
              midiNote < afterLastTunableScaleNote);
 
-      inBoundCache[midiNote] = frequency;
+      // If change, notify of change
+      if (inBoundCache[midiNote] != frequency) {
+        inBoundCache[midiNote] = frequency;
+        this->NotifyAttachersOfChange(nullptr, midiNote, frequency);
+      }
       // @TODO: Deal with updating formula set cache upon change
 
       return frequency;
