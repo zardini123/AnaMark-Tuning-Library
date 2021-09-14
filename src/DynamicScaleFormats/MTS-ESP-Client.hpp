@@ -33,6 +33,8 @@ public:
       assert(midiChannel >= -1 && midiChannel < 16);
       // @TODO: Send a rejection message/response stating scaleNoteToAcquire is out
       // of bounds
+      // @TODO: Make the bounds (0-127) a class constant or part of the API
+      assert(scaleNoteToAcquire >= 0 && scaleNoteToAcquire < 128);
 
       scaleNoteFrequencyOutput = MTS_NoteToFrequency(
           mtsClient, static_cast<char>(scaleNoteToAcquire), midiChannel);
