@@ -17,8 +17,7 @@ public:
     friend MTSESPClient;
 
   public:
-    ScaleRepresentative(MTSClient *mtsClientIn, char midiChannelIn)
-        : mtsClient{mtsClientIn}, midiChannel{midiChannelIn} {}
+    ScaleRepresentative(char midiChannelIn) : midiChannel{midiChannelIn} {}
 
     Flags<Capabilities> StateProviderCapabilities() override {
       return {
@@ -29,7 +28,12 @@ public:
 
     void HasBeenRequestedState(int scaleNoteToAcquire,
                                double &scaleNoteFrequencyOutput) override {
+      // @TODO: When a user of a ScaleRepresentative tries to obtain state from it
+      // when the ScaleRepresentative has no mtsClient anymore (deregistered), should
+      // the library assert, throw an exception, or return a error through the API
+      // stating a problem?
       assert(mtsClient != nullptr);
+
       assert(midiChannel >= -1 && midiChannel < 16);
       // @TODO: Send a rejection message/response stating scaleNoteToAcquire is out
       // of bounds
@@ -40,27 +44,52 @@ public:
           mtsClient, static_cast<char>(scaleNoteToAcquire), midiChannel);
     }
 
+  private:
     MTSClient *mtsClient = nullptr;
     char midiChannel;
-  };
+  }; // End ScaleRepresentative
 
-  MTSESPClient()
-      : mtsClient{MTS_RegisterClient()}, singleChannelScaleRep{mtsClient, -1} {}
+  MTSESPClient() : singleChannelScaleRep{-1} {}
 
-  ~MTSESPClient() {
-    MTS_DeregisterClient(mtsClient);
+  void RegisterClient() {
+    if (mtsClient == nullptr) {
+      mtsClient = MTS_RegisterClient();
+
+      UpdateRepresentativesMTSClient();
+    }
   }
 
-  ScaleRepresentative &MultiChannel(char midiChannel) {
+  void DeregisterClient() {
+    if (mtsClient != nullptr) {
+      MTS_DeregisterClient(mtsClient);
+
+      mtsClient = nullptr;
+      UpdateRepresentativesMTSClient();
+    }
+  }
+
+  bool ClientRegistered() {
+    return mtsClient != nullptr;
+  }
+
+  ~MTSESPClient() {
+    DeregisterClient();
+  }
+
+  ScaleRepresentative &MultiChannelScale(char midiChannel) {
     assert(midiChannel >= 0 && midiChannel < 16);
 
     auto existingIt = multiChannelScaleReps.insert(
-        {midiChannel, ScaleRepresentative(mtsClient, midiChannel)});
+        {midiChannel, ScaleRepresentative(midiChannel)});
 
-    return existingIt.first->second;
+    // existingIt of type pair<iterator,bool>
+    // bool is if the key existed or not
+    ScaleRepresentative &theScaleRep = existingIt.first->second;
+
+    return theScaleRep;
   }
 
-  ScaleRepresentative &SingleChannel() {
+  ScaleRepresentative &SingleChannelScale() {
     return singleChannelScaleRep;
   }
 
@@ -69,9 +98,17 @@ public:
   }
 
 private:
+  void UpdateRepresentativesMTSClient() {
+    singleChannelScaleRep.mtsClient = mtsClient;
+    for (auto &multiChannelRep : multiChannelScaleReps) {
+      multiChannelRep.second.mtsClient = mtsClient;
+    }
+  }
+
   // mtsClient must be first in parameter list here as therefore it will be
   // initalized first in the initalizer list
-  MTSClient *mtsClient;
+  MTSClient *mtsClient = nullptr;
+
   ScaleRepresentative singleChannelScaleRep;
   std::map<char, ScaleRepresentative> multiChannelScaleReps;
 };

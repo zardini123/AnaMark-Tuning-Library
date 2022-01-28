@@ -97,7 +97,7 @@ public:
   }
 
 protected:
-  bool RequestState(int scaleNoteToAcquire, double &scaleNoteFrequencyOutput) {
+  bool RequestStateFromProvier(int scaleNoteToAcquire, double &scaleNoteFrequencyOutput) {
     if (!IsAttachedToAProvider()) {
       return true;
     }
@@ -107,7 +107,7 @@ protected:
     return false;
   }
 
-  bool RequestState(std::vector<int> &scaleNotesToAcquire,
+  bool RequestStateFromProvier(std::vector<int> &scaleNotesToAcquire,
                     std::vector<double> &scaleNotesFrequenciesOutput) {
     if (!IsAttachedToAProvider()) {
       return true;
@@ -138,23 +138,23 @@ protected:
 
 private:
   void AddChangeAttacher(ChangeAttacher *observerToRegister) {
-    attachedAttachers.push_back(observerToRegister);
+    attachedChangeAttachers.push_back(observerToRegister);
   }
 
   void RemoveChangeAttacher(ChangeAttacher *observerToDeregister) {
     auto existingAttacherIt = Utilities::Find(
-        attachedAttachers.begin(), attachedAttachers.end(), observerToDeregister);
+        attachedChangeAttachers.begin(), attachedChangeAttachers.end(), observerToDeregister);
 
-    if (existingAttacherIt == attachedAttachers.end()) {
+    if (existingAttacherIt == attachedChangeAttachers.end()) {
       // @TODO: Throw exception stating observer does not exist or has already been
       // removed.
       assert(false);
     }
 
-    attachedAttachers.erase(existingAttacherIt);
+    attachedChangeAttachers.erase(existingAttacherIt);
   }
 
-  std::vector<ChangeAttacher *> attachedAttachers;
+  std::vector<ChangeAttacher *> attachedChangeAttachers;
 };
 
 // The Attacher only cares about what it needs to do when informed. It doesn't care
@@ -207,6 +207,9 @@ private:
   ChangeProvider *attachedChangeProvider = nullptr;
 };
 
+// Define following functions later to have access to access to ChangeAttacher
+// functions
+
 inline void ChangeProvider::NotifyAttachersOfChange(
     const ChangeProvider *const changeOrigin, int scaleNote, double newFrequency) {
   // Prevent feedback loops
@@ -214,7 +217,7 @@ inline void ChangeProvider::NotifyAttachersOfChange(
     return;
   }
 
-  for (auto &attachedAttacher : attachedAttachers) {
+  for (auto &attachedAttacher : attachedChangeAttachers) {
     attachedAttacher->RecieveChangeFromProvider(
         changeOrigin, this, scaleNote, newFrequency);
   }
@@ -228,7 +231,7 @@ inline void ChangeProvider::NotifyAttachersOfChange(
     return;
   }
 
-  for (auto &attachedAttacher : attachedAttachers) {
+  for (auto &attachedAttacher : attachedChangeAttachers) {
     attachedAttacher->RecieveChangeFromProvider(
         changeOrigin, this, scaleNotes, newFrequencies);
   }

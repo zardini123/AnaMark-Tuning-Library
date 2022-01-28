@@ -37,7 +37,7 @@ public:
       // @TODO:  Deal with creating API for if note is unavalible to provide
       // frequency state for
       // @TODO:  Deal with creating API for filtered notes
-      RequestState(midiNote, frequency);
+      this->RequestStateFromProvier(midiNote, frequency);
 
       assert(midiNote >= firstTunableScaleNote &&
              midiNote < afterLastTunableScaleNote);
@@ -46,6 +46,8 @@ public:
       if (inBoundCache[midiNote] != frequency) {
         inBoundCache[midiNote] = frequency;
         this->NotifyAttachersOfChange(nullptr, midiNote, frequency);
+        // State attachers do not need to be notified as they ask for state when
+        // their user requests for it
       }
       // @TODO: Deal with updating formula set cache upon change
 
