@@ -19,35 +19,59 @@ public:
   public:
     ScaleRepresentative(char midiChannelIn) : midiChannel{midiChannelIn} {}
 
-    Flags<Capabilities> StateProviderCapabilities() override {
+    Flags<Provisions> StateProvisions() override {
       return {
-          Capabilities::ScaleName,
-          Capabilities::FilterMIDINotes,
+          Provisions::Note, Provisions::MultipleNotes,
+          // @TODO: Provisions::ScaleName,
+          // @TODO: Provisions::FilterMIDINotes,
       };
     }
 
-    void HasBeenRequestedState(int scaleNoteToAcquire,
-                               double &scaleNoteFrequencyOutput) override {
+    NoteRange ProvisioningNoteRange() const override {
+      return {0, 128};
+    }
+
+    double FrequencyForMIDINote(int midiNote) override {
+      assert(mtsClient != nullptr);
+
+      // @TODO: Return out of bounds response when midiNote out of provisioning range
+
+      return MTS_NoteToFrequency(
+          mtsClient, static_cast<char>(midiNote), midiChannel);
+    }
+
+    RequestResponse HasBeenRequestedNote(int scaleNoteToAcquire,
+                                         double &scaleNoteFrequencyOutput) override {
       // @TODO: When a user of a ScaleRepresentative tries to obtain state from it
       // when the ScaleRepresentative has no mtsClient anymore (deregistered), should
       // the library assert, throw an exception, or return a error through the API
       // stating a problem?
       assert(mtsClient != nullptr);
-
       assert(midiChannel >= -1 && midiChannel < 16);
-      // @TODO: Send a rejection message/response stating scaleNoteToAcquire is out
-      // of bounds
-      // @TODO: Make the bounds (0-127) a class constant or part of the API
-      assert(scaleNoteToAcquire >= 0 && scaleNoteToAcquire < 128);
 
-      scaleNoteFrequencyOutput = MTS_NoteToFrequency(
-          mtsClient, static_cast<char>(scaleNoteToAcquire), midiChannel);
+      // @TODO: Make the bounds (0-127) a class constant or part of the API
+      if (scaleNoteToAcquire < 0 || scaleNoteToAcquire >= 128) {
+        return RequestResponse::RequestedNoteOutOfBounds;
+      }
+
+      // @TODO: Create midi to scale note mapping provision, providing 1:1 mapping of
+      // midi to scale note
+
+      scaleNoteFrequencyOutput = FrequencyForMIDINote(scaleNoteToAcquire);
+
+      return RequestResponse::RequestOK;
+    }
+
+    RequestResponse HasBeenRequestedMultipleNotes(
+        NoteRange requestedNoteRange,
+        std::vector<double> &scaleNotesFrequenciesOutput) override {
+      assert(false);
     }
 
   private:
     MTSClient *mtsClient = nullptr;
     char midiChannel;
-  }; // End ScaleRepresentative
+  }; // class ScaleRepresentative
 
   MTSESPClient() : singleChannelScaleRep{-1} {}
 
@@ -93,7 +117,7 @@ public:
     return singleChannelScaleRep;
   }
 
-  bool ConnectedToAMTSESPMaster() {
+  bool IsConnectedToAMaster() {
     return MTS_HasMaster(mtsClient);
   }
 

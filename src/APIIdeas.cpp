@@ -204,6 +204,17 @@ int main(int argc, char const *argv[]) {
     scale.DetachFromChangeProvider();
     scale.DetachFromStateProvider();
 
+    MTSESPMaster mtsESPMaster;
+
+    mtsESPMaster.SingleChannel().AttachToStateProvider(&scale);
+
+    // this->RequestStateFromProvider(note, frequencyOut)
+
+    // this->RequestAllNotesFromProvider(NoteRange out, frequenciesOut) -> ResponseCode
+    // this->RequestNoteFromProivder(note, frequencyOut) -> ResponseCode
+    // this->RequestMultipleNotesFromProvider(NoteRange, frequenciesOut) -> ResponseCode
+    // this->RequestScaleNameFromProvider(scaleNameOut) -> ResponseCode
+
     // mtsESPManager is desturcted in plugin destructor
   }
 

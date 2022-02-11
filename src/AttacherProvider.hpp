@@ -9,11 +9,41 @@
 
 namespace AnaMark {
 
-class Provider {};
+enum class RequestResponse {
+  RequestOK = 0,
+  NoNoteRequestSupport,
+  RequestedNoteOutOfBounds,
+  NoMultipleNotesRequestSupport,
+  RequestedNoteRangeOutOfBounds
+};
+
+class Provider {
+public:
+  enum class Provisions {
+    Note = 1 << 0,
+    MultipleNotes = 1 << 1,
+    ScaleName = 1 << 2,
+    FilterMIDINotes = 1 << 3,
+    MIDINoteToScaleNoteMapping = 1 << 4,
+  };
+
+  // Note range the provider provides tuning for
+  virtual NoteRange ProvisioningNoteRange() const = 0;
+
+  // @TODO: Change function to provide response, especially for when midiNote out of
+  // provisioning range
+  virtual double FrequencyForMIDINote(int midiNote) = 0;
+
+  // @TODO: FrequencyAtScaleNote()
+};
 
 class Attacher {
-  // Can only track one representation of a scale, that being transported via change
+  // Attachers can only track one representation of a scale, described (transported)
+  // via change from a
+  // - Provider change
+  // - API change
   // or state
+  // - Request state from a Provider
 public:
   bool IsAttachedToAProvider() const {
     return attached;
@@ -22,6 +52,14 @@ public:
   bool CanAttachToAProvider() const {
     return !IsAttachedToAProvider();
   }
+
+  // @TODO: OnAttachToProvider()
+  // @TODO: OnDetachFromProvider()
+
+  // If attacher requests note inside its TunableNoteRange that is outside
+  // ProvisioningNoteRange, complain
+
+  virtual NoteRange TunableNoteRange() const = 0;
 
 protected:
   void SetStatusToAttached() {
@@ -38,31 +76,17 @@ private:
 
 class StateProvider : public virtual Provider {
 public:
-  // Capabilities are the properties of a Provider that a Attacher may request of the
-  // Provider.  If a Provider is unable or able to provide certain capabiltiies, a
-  // Attacher may have different logic performed.
-  enum class Capabilities {
-    ScaleName = 1 << 0,
-    FilterMIDINotes = 1 << 1,
-    MIDINoteToScaleNoteMapping = 1 << 2,
-  };
+  virtual Flags<Provisions> StateProvisions() = 0;
 
-  virtual Flags<Capabilities> StateProviderCapabilities() = 0;
+  virtual RequestResponse HasBeenRequestedNote(int scaleNoteToAcquire,
+                                               double &scaleNoteFrequencyOutput) = 0;
 
-  virtual void HasBeenRequestedState(int scaleNoteToAcquire,
-                                     double &scaleNoteFrequencyOutput) = 0;
+  virtual RequestResponse HasBeenRequestedMultipleNotes(
+      NoteRange requestedNoteRange,
+      std::vector<double> &scaleNotesFrequenciesOutput) = 0;
 
-  virtual void HasBeenRequestedState(
-      const std::vector<int> &scaleNotesToAcquire,
-      std::vector<double> &scaleNotesFrequenciesOutput) {
-    scaleNotesFrequenciesOutput.clear();
-
-    for (int scaleNote : scaleNotesToAcquire) {
-      double frequencyOut = 0.0;
-      HasBeenRequestedState(scaleNote, frequencyOut);
-      scaleNotesFrequenciesOutput.push_back(frequencyOut);
-    }
-  }
+  // @TODO: Route to request scale name
+  // @TODO: Route to request all avaliable scale notes
 };
 
 class StateAttacher : public virtual Attacher {
@@ -97,24 +121,26 @@ public:
   }
 
 protected:
-  bool RequestStateFromProvier(int scaleNoteToAcquire, double &scaleNoteFrequencyOutput) {
+  bool RequestNoteFromProvider(int scaleNoteToAcquire,
+                               double &scaleNoteFrequencyOutput) {
     if (!IsAttachedToAProvider()) {
       return true;
     }
 
-    attachedStateProvider->HasBeenRequestedState(scaleNoteToAcquire,
-                                                 scaleNoteFrequencyOutput);
+    attachedStateProvider->HasBeenRequestedNote(scaleNoteToAcquire,
+                                                scaleNoteFrequencyOutput);
     return false;
   }
 
-  bool RequestStateFromProvier(std::vector<int> &scaleNotesToAcquire,
-                    std::vector<double> &scaleNotesFrequenciesOutput) {
+  bool RequestMultipleNotesFromProvider(
+      NoteRange noteRangeToRequest,
+      std::vector<double> &scaleNotesFrequenciesOutput) {
     if (!IsAttachedToAProvider()) {
       return true;
     }
 
-    attachedStateProvider->HasBeenRequestedState(scaleNotesToAcquire,
-                                                 scaleNotesFrequenciesOutput);
+    attachedStateProvider->HasBeenRequestedMultipleNotes(
+        noteRangeToRequest, scaleNotesFrequenciesOutput);
     return false;
   }
 
@@ -129,12 +155,12 @@ class ChangeProvider : public virtual Provider {
   friend ChangeAttacher;
 
 protected:
-  void NotifyAttachersOfChange(const ChangeProvider *const changeOrigin,
-                               int scaleNote, double newFrequency);
+  void NotifyAttachersOfNoteChange(const ChangeAttacher *const notificationOrigin,
+                                   int scaleNote, double newFrequency);
 
-  void NotifyAttachersOfChange(const ChangeProvider *const changeOrigin,
-                               std::vector<int> &scaleNotes,
-                               std::vector<double> &newFrequencies);
+  void NotifyAttachersOfMultipleNotesChange(
+      const ChangeAttacher *const notificationOrigin, NoteRange changedNoteRange,
+      std::vector<double> &newFrequencies);
 
 private:
   void AddChangeAttacher(ChangeAttacher *observerToRegister) {
@@ -142,8 +168,9 @@ private:
   }
 
   void RemoveChangeAttacher(ChangeAttacher *observerToDeregister) {
-    auto existingAttacherIt = Utilities::Find(
-        attachedChangeAttachers.begin(), attachedChangeAttachers.end(), observerToDeregister);
+    auto existingAttacherIt = Utilities::Find(attachedChangeAttachers.begin(),
+                                              attachedChangeAttachers.end(),
+                                              observerToDeregister);
 
     if (existingAttacherIt == attachedChangeAttachers.end()) {
       // @TODO: Throw exception stating observer does not exist or has already been
@@ -194,46 +221,78 @@ public:
     return oldAttachedChangeProvider;
   }
 
-private:
-  virtual void RecieveChangeFromProvider(const ChangeProvider *const changeOrigin,
-                                         const ChangeProvider *const notifier,
-                                         int scaleNote, double newFrequency) = 0;
+  bool ChangeScaleNoteFrequency(int scaleNote, double newFrequency) {
+    // Do not allow users to modify frequencies if scale is already attached to a
+    // provider.
+    if (!IsAttachedToAProvider()) {
+      return true;
+    }
 
-  virtual void RecieveChangeFromProvider(const ChangeProvider *const changeOrigin,
-                                         const ChangeProvider *const notifier,
-                                         std::vector<int> &scaleNotes,
-                                         std::vector<double> &newFrequencies) = 0;
+    // @TODO: Complain if outside TunableNoteRange()
+
+    RecieveNoteChangeFromProvider(this, scaleNote, newFrequency);
+    return false;
+  }
+
+  bool ChangeScaleNotesFrequencies(NoteRange noteRangeToChange,
+                                   std::vector<double> &newFrequencies) {
+    // Do not allow users to modify frequencies if scale is already attached to a
+    // provider.
+    if (!IsAttachedToAProvider()) {
+      return true;
+    }
+
+    // @TODO: Complain if outside TunableNoteRange()
+
+    RecieveMultipleNotesChangeFromProvider(this, noteRangeToChange, newFrequencies);
+    return false;
+  }
+
+private:
+  virtual void RecieveNoteChangeFromProvider(
+      const ChangeAttacher *const notificationOrigin, int scaleNote,
+      double newFrequency) = 0;
+
+  virtual void RecieveMultipleNotesChangeFromProvider(
+      const ChangeAttacher *const notificationOrigin, NoteRange changedNoteRange,
+      std::vector<double> &newFrequencies) = 0;
 
   ChangeProvider *attachedChangeProvider = nullptr;
 };
 
-// Define following functions later to have access to access to ChangeAttacher
-// functions
+// Define following functions later to have knowledge of ChangeAttacher functions
+// Recieve*
 
-inline void ChangeProvider::NotifyAttachersOfChange(
-    const ChangeProvider *const changeOrigin, int scaleNote, double newFrequency) {
-  // Prevent feedback loops
-  if (changeOrigin == this) {
-    return;
-  }
+inline void ChangeProvider::NotifyAttachersOfNoteChange(
+    const ChangeAttacher *const notificationOrigin, int scaleNote,
+    double newFrequency) {
+  assert(notificationOrigin != nullptr);
 
   for (auto &attachedAttacher : attachedChangeAttachers) {
-    attachedAttacher->RecieveChangeFromProvider(
-        changeOrigin, this, scaleNote, newFrequency);
+    // Prevent feedback loops
+    if (notificationOrigin == attachedAttacher) {
+      continue;
+    }
+
+    // "this" is the notifier of change
+    attachedAttacher->RecieveNoteChangeFromProvider(
+        notificationOrigin, scaleNote, newFrequency);
   }
 }
 
-inline void ChangeProvider::NotifyAttachersOfChange(
-    const ChangeProvider *const changeOrigin, std::vector<int> &scaleNotes,
+inline void ChangeProvider::NotifyAttachersOfMultipleNotesChange(
+    const ChangeAttacher *const notificationOrigin, NoteRange changedNoteRange,
     std::vector<double> &newFrequencies) {
-  // Prevent feedback loops
-  if (changeOrigin == this) {
-    return;
-  }
+  assert(notificationOrigin != nullptr);
 
   for (auto &attachedAttacher : attachedChangeAttachers) {
-    attachedAttacher->RecieveChangeFromProvider(
-        changeOrigin, this, scaleNotes, newFrequencies);
+    // Prevent feedback loops
+    if (notificationOrigin == attachedAttacher) {
+      continue;
+    }
+
+    attachedAttacher->RecieveMultipleNotesChangeFromProvider(
+        notificationOrigin, changedNoteRange, newFrequencies);
   }
 }
 

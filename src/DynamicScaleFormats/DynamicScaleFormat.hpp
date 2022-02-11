@@ -8,29 +8,6 @@ namespace AnaMark {
 
 class DynamicScaleFormat : public Format {
 public:
-  enum class Capabilities {
-    InputNotesToScale = 1 << 0,
-    OutputNotesFromScale = 1 << 1,
-    InputMultiChannelNotesToScale = 1 << 2,
-    OutputMultiChannelNotesFromScale = 1 << 3,
-  };
-
-  enum class Assignment {
-    Input = 1 << 0,
-    Output = 1 << 1,
-    InputAndOutput = Input | Output,
-  };
-
-  virtual const Flags<Capabilities> FormatCapabilities(
-      VersionNumber versionNumber) = 0;
-
-  // I want to send my changes to a scale
-  // I want a scale to send its changes to me
-
-  // RegisterOutputScale(Scale *)
-  // RegisterInputScale(Scale *)
-
-  // RegisterOutputScales()
 };
 
 } // namespace AnaMark

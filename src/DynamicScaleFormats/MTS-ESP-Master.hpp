@@ -7,11 +7,51 @@
 #include "../../lib/MTS-ESP/Master/libMTSMaster.h"
 
 #include <array>
+#include <numeric>
 #include <vector>
 
 namespace AnaMark {
 
-class MTSESPMaster : public DynamicScaleFormat {};
+class MTSESPMaster {
+public:
+  class ScaleRepresentative : public ChangeAttacher, public StateAttacher {
+  public:
+    ScaleRepresentative() : frequenciesFromProvider{128} {}
+
+    bool UpdateState() {
+      // Utilitiy for attaching MTSESPMaster as a StateAttacher.
+      // Requires UpdateState() to be called every moment the scale data is desired
+      // to be updated, as it will fetch state from StateProvider.
+
+      this->RequestAllNotesFromProvider(noteRangeFromProvider,
+                                        frequenciesFromProvider);
+
+      MTS_SetNoteTunings(frequenciesFromProvider.data());
+    }
+
+  private:
+    std::vector<double> frequenciesFromProvider;
+  }; // class ScaleRepresentative
+
+  // @TODO: Crash reinitalization with MTS_Reinitialize()
+
+  void RegisterMaster() {
+    if (!MTS_CanRegisterMaster()) {
+      // @TODO: Throw exception stating there is a master already instanced
+      assert(false);
+    }
+
+    MTS_RegisterMaster();
+  }
+
+  void DeregisterMaster() {
+    MTS_DeregisterMaster();
+  }
+
+  int GetClientCount() {
+    return MTS_GetNumClients();
+  }
+};
 
 } // namespace AnaMark
 

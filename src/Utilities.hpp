@@ -6,6 +6,7 @@
 namespace AnaMark {
 
 namespace Utilities {
+
 template <typename InputIterator, typename T>
 static InputIterator Find(InputIterator first, InputIterator last, const T &val) {
   while (first != last) {
@@ -18,6 +19,21 @@ static InputIterator Find(InputIterator first, InputIterator last, const T &val)
   return last;
 }
 } // namespace Utilities
+
+class NoteRange {
+public:
+  NoteRange(int firstNoteIn, int afterLastNoteIn)
+      : firstNote{firstNoteIn}, afterLastNote{afterLastNoteIn} {}
+
+  // Inclusive
+  int firstNote;
+  // Exclusive
+  int afterLastNote;
+
+  std::size_t Size() const {
+    return afterLastNote - firstNote;
+  }
+};
 
 template <typename FlagsType,
           typename UnderlyingType = typename std::underlying_type<FlagsType>::type>
