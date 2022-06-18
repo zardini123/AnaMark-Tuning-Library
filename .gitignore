@@ -1,3 +1,5 @@
+*.o
+
 # General
 .DS_Store
 .AppleDouble

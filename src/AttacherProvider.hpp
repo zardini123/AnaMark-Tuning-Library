@@ -9,6 +9,8 @@
 
 namespace AnaMark {
 
+// https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+
 enum class RequestResponse {
   RequestOK = 0,
   NoNoteRequestSupport,
@@ -56,8 +58,9 @@ public:
   // @TODO: OnAttachToProvider()
   // @TODO: OnDetachFromProvider()
 
-  // If attacher requests note inside its TunableNoteRange that is outside
-  // ProvisioningNoteRange, complain
+  // If attacher requests note to provider thats inside its TunableNoteRange, but is
+  // outside the provider's ProvisioningNoteRange, complain about provider attached
+  // unable to provide for that tunable note.
 
   virtual NoteRange TunableNoteRange() const = 0;
 
@@ -155,11 +158,11 @@ class ChangeProvider : public virtual Provider {
   friend ChangeAttacher;
 
 protected:
-  void NotifyAttachersOfNoteChange(const ChangeAttacher *const notificationOrigin,
+  void NotifyAttachersOfNoteChange(const ChangeProvider *const notificationOrigin,
                                    int scaleNote, double newFrequency);
 
   void NotifyAttachersOfMultipleNotesChange(
-      const ChangeAttacher *const notificationOrigin, NoteRange changedNoteRange,
+      const ChangeProvider *const notificationOrigin, NoteRange changedNoteRange,
       std::vector<double> &newFrequencies);
 
 private:
@@ -230,7 +233,7 @@ public:
 
     // @TODO: Complain if outside TunableNoteRange()
 
-    RecieveNoteChangeFromProvider(this, scaleNote, newFrequency);
+    RecieveNoteChangeFromProvider(nullptr, scaleNote, newFrequency);
     return false;
   }
 
@@ -244,17 +247,18 @@ public:
 
     // @TODO: Complain if outside TunableNoteRange()
 
-    RecieveMultipleNotesChangeFromProvider(this, noteRangeToChange, newFrequencies);
+    RecieveMultipleNotesChangeFromProvider(
+        nullptr, noteRangeToChange, newFrequencies);
     return false;
   }
 
 private:
   virtual void RecieveNoteChangeFromProvider(
-      const ChangeAttacher *const notificationOrigin, int scaleNote,
+      const ChangeProvider *const notificationOrigin, int scaleNote,
       double newFrequency) = 0;
 
   virtual void RecieveMultipleNotesChangeFromProvider(
-      const ChangeAttacher *const notificationOrigin, NoteRange changedNoteRange,
+      const ChangeProvider *const notificationOrigin, NoteRange changedNoteRange,
       std::vector<double> &newFrequencies) = 0;
 
   ChangeProvider *attachedChangeProvider = nullptr;
@@ -264,13 +268,17 @@ private:
 // Recieve*
 
 inline void ChangeProvider::NotifyAttachersOfNoteChange(
-    const ChangeAttacher *const notificationOrigin, int scaleNote,
-    double newFrequency) {
-  assert(notificationOrigin != nullptr);
+    const ChangeProvider *notificationOrigin, int scaleNote, double newFrequency) {
+
+  if (notificationOrigin == nullptr) {
+    notificationOrigin = this;
+  }
 
   for (auto &attachedAttacher : attachedChangeAttachers) {
-    // Prevent feedback loops
-    if (notificationOrigin == attachedAttacher) {
+    // Avoid providing change to attacher if the provider of change is the same as
+    // the one about to recieve the change.  Prevents feedback loops.
+    if (dynamic_cast<const ChangeAttacher *>(notificationOrigin) ==
+        attachedAttacher) {
       continue;
     }
 
@@ -281,13 +289,18 @@ inline void ChangeProvider::NotifyAttachersOfNoteChange(
 }
 
 inline void ChangeProvider::NotifyAttachersOfMultipleNotesChange(
-    const ChangeAttacher *const notificationOrigin, NoteRange changedNoteRange,
+    const ChangeProvider *notificationOrigin, NoteRange changedNoteRange,
     std::vector<double> &newFrequencies) {
-  assert(notificationOrigin != nullptr);
+
+  if (notificationOrigin == nullptr) {
+    notificationOrigin = this;
+  }
 
   for (auto &attachedAttacher : attachedChangeAttachers) {
-    // Prevent feedback loops
-    if (notificationOrigin == attachedAttacher) {
+    // Avoid providing change to attacher if the provider of change is the same as
+    // the one about to recieve the change.  Prevents feedback loops.
+    if (dynamic_cast<const ChangeAttacher *>(notificationOrigin) ==
+        attachedAttacher) {
       continue;
     }
 

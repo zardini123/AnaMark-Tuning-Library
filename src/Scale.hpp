@@ -229,7 +229,7 @@ public:
 private:
   // ChangeAttacher
 
-  void RecieveNoteChangeFromProvider(const ChangeAttacher *const notificationOrigin,
+  void RecieveNoteChangeFromProvider(const ChangeProvider *const notificationOrigin,
                                      int scaleNote, double newFrequency) override {
 
     // Directly changing one note frequency outside tunable range is ambiguous,
@@ -255,7 +255,7 @@ private:
   }
 
   void RecieveMultipleNotesChangeFromProvider(
-      const ChangeAttacher *const notificationOrigin, NoteRange changedNoteRange,
+      const ChangeProvider *const notificationOrigin, NoteRange changedNoteRange,
       std::vector<double> &newFrequencies) override {
 
     // @TODO: Verify noteRangeToChange is in bounds
