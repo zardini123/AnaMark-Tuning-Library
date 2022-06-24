@@ -33,6 +33,16 @@ public:
   std::size_t Size() const {
     return afterLastNote - firstNote;
   }
+
+  bool HasNoteInside(int note) const {
+    return (note >= this->firstNote) && (note < this->afterLastNote);
+  }
+
+  bool IsNotOutside(const NoteRange &other) const {
+    // Is inside or meets at extents
+    return (this->firstNote >= other.firstNote) &&
+           (this->afterLastNote <= other.afterLastNote);
+  }
 };
 
 template <typename FlagsType,

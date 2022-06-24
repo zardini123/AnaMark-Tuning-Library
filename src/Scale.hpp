@@ -26,17 +26,12 @@ public:
   // Attacher
 
   NoteRange TunableNoteRange() const override {
-    // Range to tune.
-    // "If musician wants something to span the compelte range, he has to tune it for
-    // the complete range."
-    // Optimize for what musicians consider the common case (0-127 scale notes, or
-    // whatever they consider).
-
-    // @TODO: Tunable range should default to 0-127 when no state provider is
-    // attached.  When a provider is attached, the tunable range must be the range
-    // the provider affects as not doing so and modifying frequencies outside that
-    // range manually via API means scale does not represent scale provider fully.
-    // Therefore tunable range must become dynamic.
+    // @TODO: Tunable range should default to 0-127 when NOT attached to a provider.
+    // When attached to a provider, the tunable range must be the range the provider
+    // provides for, as not doing so and modifying frequencies outside that range, or
+    // not being able to modify all notes in the range, means scale does not
+    // represent scale provider fully.
+    // Therefore, tunable range must be dynamic.
     return {0, 128};
   }
 
@@ -45,8 +40,8 @@ public:
   // Provider
 
   NoteRange ProvisioningNoteRange() const override {
-    // @TODO: Make provising note range int min/max once formulas are set.
-    return {0, 128};
+    // Scale provides tuning for the same notes that are tunable
+    return this->TunableNoteRange();
   }
 
   double FrequencyForMIDINote(int midiNote) override {
@@ -225,6 +220,35 @@ public:
   }
 
   // End StateProvider
+
+  // ChangeProvider
+
+  Flags<Provisions> ChangeProvisions() override {
+    return StateProvisions();
+  }
+
+  // End ChangeProvider
+
+  // ChangeAttacher
+
+  Flags<Attachments> ChangeAttachments() override {
+    return StateProvisions();
+  }
+
+  // End ChangeAttacher
+
+  // StateAttacher
+
+  Flags<Attachments> StateAttachments() override {
+    return StateProvisions();
+  }
+
+  void Import() override {
+    // @TODO: Import()
+    assert(false);
+  }
+
+  // End StateAttacher
 
 private:
   // ChangeAttacher

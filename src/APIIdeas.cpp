@@ -1,4 +1,5 @@
-#include "DynamicScaleFormats/MTS-ESP-Client.hpp"
+#include "DynamicScaleFormats/MTS-ESP/Client.hpp"
+#include "DynamicScaleFormats/MTS-ESP/Master.hpp"
 #include "DynamicScaleFormats/MTS.hpp"
 #include "Scale.hpp"
 #include "ScaleFormats/TUN.hpp"
@@ -193,20 +194,27 @@ int main(int argc, char const *argv[]) {
     Scale scale; // been used, initalized
 
     // Called from the plugin constructor
-    MTSESPClient mtsESPManager;
+    MTSESP::Client mtsESPClient;
 
-    scale.AttachToStateProvider(&mtsESPManager.SingleChannel());
+    MTSESP::Master mtsESPMaster;
 
-    MTS mts;
+    scale.AttachToStateProvider(&mtsESPClient.NoChannelScale());
 
-    scale.AttachToChangeProvider(&mts);
+    // MTS mts;
+    //
+    // scale.AttachToChangeProvider(&mts);
+    // scale.DetachFromChangeProvider();
 
-    scale.DetachFromChangeProvider();
     scale.DetachFromStateProvider();
 
-    MTSESPMaster mtsESPMaster;
+    mtsESPMaster.NoChannelScale().AttachToStateProvider(&scale);
 
-    mtsESPMaster.SingleChannel().AttachToStateProvider(&scale);
+    mtsESPMaster.NoChannelScale().DetachFromStateProvider();
+
+    auto scaleRepresentative = mtsESPMaster.ScaleForChannel(0);
+    scaleRepresentative.AttachToChangeProvider(&scale);
+
+    scaleRepresentative.DetachFromChangeProvider();
 
     // this->RequestStateFromProvider(note, frequencyOut)
 
